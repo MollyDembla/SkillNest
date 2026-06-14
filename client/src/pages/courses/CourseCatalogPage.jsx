@@ -1,255 +1,244 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { getCourses } from "../../services/courseService";
-import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
-import { useWishlist } from "../../context/WishlistContext";
+import React, { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getCourses } from "../../services/courseService";
+import CourseCard from "../../components/course/CourseCard";
 
-function CourseCard({ course }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { cart, add: addToCart } = useCart();
-  const { wishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
-  const [cartLoading, setCartLoading] = useState(false);
-  const [wishlistLoading, setWishlistLoading] = useState(false);
-
-  const id = course._id;
-  const inCart = cart?.items?.some((item) => item._id?.toString() === id);
-  const inWishlist = wishlist?.courses?.some((c) => c._id?.toString() === id);
-  const isStudent = user?.role === "student";
-
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    if (!user) return navigate("/auth/login");
-    if (inCart) return navigate("/cart");
-    setCartLoading(true);
-    try {
-      await addToCart(id);
-      toast.success("Added to cart!");
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to add to cart.");
-    } finally {
-      setCartLoading(false);
-    }
-  };
-
-  const handleWishlist = async (e) => {
-    e.preventDefault();
-    if (!user) return navigate("/auth/login");
-    setWishlistLoading(true);
-    try {
-      if (inWishlist) {
-        await removeFromWishlist(id);
-        toast.success("Removed from wishlist.");
-      } else {
-        await addToWishlist(id);
-        toast.success("Saved to wishlist!");
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Action failed.");
-    } finally {
-      setWishlistLoading(false);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        borderRadius: "1.5rem",
-        background: "rgba(255,255,255,0.94)",
-        boxShadow: "0 20px 60px rgba(95,73,153,0.10)",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        transition: "transform 0.15s, box-shadow 0.15s",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "0 28px 70px rgba(95,73,153,0.16)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 20px 60px rgba(95,73,153,0.10)";
-      }}
-    >
-      <Link to={`/courses/${id}`} style={{ textDecoration: "none", color: "inherit" }}>
-        {/* Thumbnail */}
-        <div
-          style={{
-            height: "160px",
-            background: course.thumbnail
-              ? `url(${course.thumbnail}) center/cover no-repeat`
-              : "linear-gradient(135deg, #efe8ff 0%, #d8c4ff 100%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {!course.thumbnail && (
-            <span style={{ fontSize: "36px", opacity: 0.4 }}>📚</span>
-          )}
-        </div>
-
-        {/* Info */}
-        <div style={{ padding: "18px 18px 12px" }}>
-          {course.category && (
-            <span
-              style={{
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "#9b8ec4",
-              }}
-            >
-              {course.category}
-            </span>
-          )}
-          <h2
-            style={{
-              margin: "6px 0 4px",
-              fontSize: "16px",
-              fontWeight: 800,
-              lineHeight: 1.3,
-              color: "#3c3168",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {course.title}
-          </h2>
-          {course.instructor?.name && (
-            <p style={{ margin: 0, fontSize: "12px", color: "#9b8ec4" }}>
-              {course.instructor.name}
-            </p>
-          )}
-          <div
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span style={{ fontSize: "18px", fontWeight: 900, color: "#5d4e98" }}>
-              {course.price === 0 ? "Free" : `$${course.price.toFixed(2)}`}
-            </span>
-            {course.averageRating > 0 && (
-              <span style={{ fontSize: "12px", color: "#9b8ec4" }}>
-                ⭐ {course.averageRating.toFixed(1)}
-              </span>
-            )}
-          </div>
-        </div>
-      </Link>
-
-      {/* Action buttons */}
-      {(!user || isStudent) && (
-        <div
-          style={{
-            padding: "0 18px 18px",
-            display: "grid",
-            gridTemplateColumns: "1fr auto",
-            gap: "8px",
-            marginTop: "auto",
-          }}
-        >
-          <button
-            onClick={handleAddToCart}
-            disabled={cartLoading}
-            style={{
-              border: "none",
-              borderRadius: "14px",
-              padding: "10px 14px",
-              fontSize: "13px",
-              fontWeight: 800,
-              cursor: "pointer",
-              opacity: cartLoading ? 0.7 : 1,
-              background: inCart
-                ? "#e8f9ee"
-                : "linear-gradient(135deg, #7c5cbf 0%, #5f4999 100%)",
-              color: inCart ? "#2a8d53" : "white",
-              transition: "opacity 0.15s",
-            }}
-          >
-            {cartLoading ? "…" : inCart ? "In Cart ✓" : "Add to Cart"}
-          </button>
-
-          <button
-            onClick={handleWishlist}
-            disabled={wishlistLoading}
-            title={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
-            style={{
-              border: "none",
-              borderRadius: "14px",
-              padding: "10px 14px",
-              fontSize: "16px",
-              cursor: "pointer",
-              opacity: wishlistLoading ? 0.7 : 1,
-              background: inWishlist ? "#fdeef3" : "#f4ebff",
-              color: inWishlist ? "#c0284d" : "#5d4e98",
-              transition: "opacity 0.15s",
-            }}
-          >
-            {wishlistLoading ? "…" : inWishlist ? "♥" : "♡"}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+const LEVELS = ["all", "beginner", "intermediate", "advanced"];
+const SORTS = [
+  { value: "newest", label: "Newest" },
+  { value: "rating", label: "Top Rated" },
+  { value: "price_asc", label: "Price: Low to High" },
+  { value: "price_desc", label: "Price: High to Low" },
+];
+const CATEGORIES = [
+  "All", "Development", "Business", "Design", "Marketing",
+  "Data Science", "Photography", "Health", "Music",
+];
 
 export default function CourseCatalogPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await getCourses({ limit: 12 });
-        setCourses(res.data.courses || []);
-      } catch {
-        toast.error("Failed to load courses.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+  const level = searchParams.get("level") || "all";
+  const sort = searchParams.get("sort") || "newest";
+  const category = searchParams.get("category") || "";
+
+  const setParam = (key, value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value && value !== "all" && value !== "All") {
+      next.set(key, value);
+    } else {
+      next.delete(key);
+    }
+    next.delete("page");
+    setSearchParams(next);
+    setPage(1);
+  };
+
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = { page, limit: 12, sort };
+      if (level !== "all") params.level = level;
+      if (category && category !== "All") params.category = category;
+      const res = await getCourses(params);
+      setCourses(res.data?.courses || []);
+      setTotal(res.data?.total || 0);
+    } catch {
+      toast.error("Failed to load courses.");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, level, sort, category]);
+
+  useEffect(() => { fetchCourses(); }, [fetchCourses]);
+
+  const totalPages = Math.ceil(total / 12);
 
   return (
-    <div className="min-h-screen px-4 py-10" style={{ background: "#f7f1fb" }}>
-      <div className="mx-auto max-w-6xl">
-        <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 900, color: "#3c3168" }}>
-          Browse Courses
-        </h1>
-        <p style={{ margin: "8px 0 0", fontSize: "15px", color: "#6d658e" }}>
-          Explore our published courses and start learning today.
-        </p>
+    <div style={{ background: "#fff", minHeight: "100vh" }}>
+      {/* Page header */}
+      <div style={{ background: "#f7f9fa", borderBottom: "1px solid #e8e8e8", padding: "32px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <h1 style={{ fontSize: 30, fontWeight: 900, color: "#1c1d1f", margin: "0 0 4px" }}>
+            All Courses
+          </h1>
+          <p style={{ margin: 0, fontSize: 14, color: "#6a6f73" }}>
+            {total > 0 ? `${total.toLocaleString()} courses available` : "Explore our course catalog"}
+          </p>
+        </div>
+      </div>
 
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px" }}>
+        {/* Filters */}
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginBottom: 24,
+            paddingBottom: 24,
+            borderBottom: "1px solid #e8e8e8",
+          }}
+        >
+          {/* Category filter */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {CATEGORIES.map((cat) => {
+              const isActive = cat === "All" ? !category : category === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setParam("category", cat)}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 20,
+                    border: `1.5px solid ${isActive ? "#5f4999" : "#d1d7dc"}`,
+                    background: isActive ? "#5f4999" : "#fff",
+                    color: isActive ? "#fff" : "#1c1d1f",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+            {/* Level */}
+            <select
+              value={level}
+              onChange={(e) => setParam("level", e.target.value)}
+              style={{
+                padding: "7px 12px",
+                border: "1.5px solid #d1d7dc",
+                borderRadius: 4,
+                fontSize: 13,
+                color: "#1c1d1f",
+                background: "#fff",
+                cursor: "pointer",
+                outline: "none",
+              }}
+            >
+              {LEVELS.map((l) => (
+                <option key={l} value={l}>
+                  {l === "all" ? "All Levels" : l.charAt(0).toUpperCase() + l.slice(1)}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort */}
+            <select
+              value={sort}
+              onChange={(e) => setParam("sort", e.target.value)}
+              style={{
+                padding: "7px 12px",
+                border: "1.5px solid #d1d7dc",
+                borderRadius: 4,
+                fontSize: 13,
+                color: "#1c1d1f",
+                background: "#fff",
+                cursor: "pointer",
+                outline: "none",
+              }}
+            >
+              {SORTS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Results */}
         {loading ? (
-          <div style={{ marginTop: "48px", textAlign: "center", color: "#9b8ec4" }}>
+          <div style={{ textAlign: "center", padding: "80px 0", color: "#6a6f73" }}>
             Loading courses…
           </div>
         ) : courses.length === 0 ? (
-          <div style={{ marginTop: "48px", textAlign: "center", color: "#9b8ec4" }}>
-            No courses available yet.
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+            <p style={{ color: "#6a6f73", fontSize: 15, margin: 0 }}>
+              No courses found for the selected filters.
+            </p>
           </div>
         ) : (
           <div
-            className="mt-8"
             style={{
               display: "grid",
-              gap: "20px",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+              gap: 20,
             }}
           >
             {courses.map((course) => (
               <CourseCard key={course._id} course={course} />
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 40 }}>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              style={{
+                padding: "8px 16px",
+                border: "1.5px solid #d1d7dc",
+                borderRadius: 4,
+                background: "#fff",
+                color: page === 1 ? "#a3a8ae" : "#1c1d1f",
+                cursor: page === 1 ? "not-allowed" : "pointer",
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              ← Prev
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  style={{
+                    padding: "8px 14px",
+                    border: `1.5px solid ${p === page ? "#5f4999" : "#d1d7dc"}`,
+                    borderRadius: 4,
+                    background: p === page ? "#5f4999" : "#fff",
+                    color: p === page ? "#fff" : "#1c1d1f",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              style={{
+                padding: "8px 16px",
+                border: "1.5px solid #d1d7dc",
+                borderRadius: 4,
+                background: "#fff",
+                color: page === totalPages ? "#a3a8ae" : "#1c1d1f",
+                cursor: page === totalPages ? "not-allowed" : "pointer",
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              Next →
+            </button>
           </div>
         )}
       </div>

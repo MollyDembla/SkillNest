@@ -114,10 +114,10 @@ const logout = asyncHandler(async (req, res, next) => {
  * Forgot password link generator
  */
 const forgotPassword = asyncHandler(async (req, res, next) => {
-  await authService.forgotPassword(req.body.email);
+  const result = await authService.forgotPassword(req.body.email);
 
   res.status(200).json(
-    new ApiResponse(200, null, 'Password reset email sent.')
+    new ApiResponse(200, result, 'Reset link generated.')
   );
 });
 

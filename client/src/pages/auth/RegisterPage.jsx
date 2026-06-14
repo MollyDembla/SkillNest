@@ -3,220 +3,198 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AuthShell from "../../components/auth/AuthShell";
 
-const inputStyle = {
+const field = { display: "flex", flexDirection: "column", gap: 6 };
+const label = { fontSize: 13, fontWeight: 600, color: "#1c1d1f" };
+const input = {
   width: "100%",
-  borderRadius: "18px",
-  border: "1px solid #eadff8",
-  background: "#fcfaff",
-  padding: "14px 16px",
-  fontSize: "15px",
+  padding: "11px 14px",
+  border: "1.5px solid #d1d7dc",
+  borderRadius: 4,
+  fontSize: 15,
+  color: "#1c1d1f",
+  background: "#fff",
   outline: "none",
-  color: "#3d3666",
   boxSizing: "border-box",
-};
-
-const labelStyle = {
-  display: "block",
-  marginBottom: "8px",
-  fontSize: "14px",
-  fontWeight: 700,
-  color: "#53467f",
-};
-
-const buttonStyle = {
-  width: "100%",
-  border: "none",
-  borderRadius: "18px",
-  padding: "14px 16px",
-  fontSize: "15px",
-  fontWeight: 800,
-  background: "#6d4ef5",
-  color: "white",
-  cursor: "pointer",
-  boxShadow: "0 14px 28px rgba(109, 78, 245, 0.2)",
+  fontFamily: "inherit",
 };
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "student" });
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState({ type: "", message: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [focused, setFocused] = useState(null);
 
-  const updateField = (field, value) =>
-    setForm((current) => ({ ...current, [field]: value }));
+  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
-      setFeedback({ type: "error", message: "Please fill in all fields." });
-      return;
-    }
-    if (form.password.length < 6) {
-      setFeedback({ type: "error", message: "Password must be at least 6 characters." });
-      return;
-    }
-
+    if (!form.name || !form.email || !form.password) { setError("Please fill in all fields."); return; }
+    if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
     setLoading(true);
-    setFeedback({ type: "", message: "" });
-
+    setError("");
     try {
       await register(form);
-      setFeedback({
-        type: "success",
-        message: "Account created! Check your email to verify your account, then sign in.",
-      });
-      setForm({ name: "", email: "", password: "", role: "student" });
-    } catch (error) {
-      setFeedback({
-        type: "error",
-        message: error?.response?.data?.message || "Registration failed. Please try again.",
-      });
+      setSuccess(true);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputStyle = (name) => ({
+    ...input,
+    borderColor: focused === name ? "#5f4999" : "#d1d7dc",
+    transition: "border-color 0.15s",
+  });
+
   return (
     <AuthShell
-      eyebrow="Create account"
-      title="Join SkillNest today"
-      subtitle="Start learning or share your expertise — create your free account in seconds."
+      title="Create your account"
+      subtitle="Start learning or share your expertise — it's free."
       footer={
-        <Link
-          to="/auth/login"
-          style={{ color: "#6d4ef5", fontWeight: 700, textDecoration: "none" }}
-        >
-          Already have an account? Sign in
+        <Link to="/auth/login" style={{ color: "#5f4999", fontWeight: 600, textDecoration: "none", fontSize: 14 }}>
+          Already have an account? Log in
         </Link>
       }
     >
-      {feedback.type === "success" ? (
-        <div
-          style={{
-            borderRadius: "24px",
-            background: "#e8f9ee",
-            padding: "24px",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              margin: "0 auto 16px",
-              width: "56px",
-              height: "56px",
-              borderRadius: "9999px",
-              background: "#dff8e7",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "22px",
-              fontWeight: 900,
-              color: "#2a8d53",
-            }}
-          >
+      {success ? (
+        <div style={{ textAlign: "center", padding: "20px 0" }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: "50%", background: "#dcfce7",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24, color: "#16a34a", margin: "0 auto 16px",
+          }}>
             ✓
           </div>
-          <p style={{ margin: "0 0 20px", fontSize: "14px", lineHeight: 1.8, color: "#2a8d53" }}>
-            {feedback.message}
+          <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: "#1c1d1f" }}>
+            Account created!
+          </h3>
+          <p style={{ margin: "0 0 24px", fontSize: 14, color: "#6a6f73", lineHeight: 1.6 }}>
+            Check your email to verify your account, then log in.
           </p>
           <Link
             to="/auth/login"
             style={{
-              display: "inline-flex",
-              borderRadius: "999px",
-              background: "#6d4ef5",
-              padding: "12px 24px",
-              fontSize: "14px",
+              display: "inline-block",
+              padding: "12px 28px",
+              background: "#5f4999",
+              color: "#fff",
+              borderRadius: 4,
+              fontSize: 14,
               fontWeight: 700,
-              color: "white",
               textDecoration: "none",
             }}
           >
-            Go to Sign in
+            Go to Log in
           </Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
-          <div>
-            <label style={labelStyle}>Full name</label>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={field}>
+            <label style={label}>Full name</label>
             <input
               value={form.name}
-              onChange={(e) => updateField("name", e.target.value)}
+              onChange={(e) => update("name", e.target.value)}
               placeholder="Your full name"
-              style={inputStyle}
+              style={inputStyle("name")}
+              onFocus={() => setFocused("name")}
+              onBlur={() => setFocused(null)}
             />
           </div>
 
-          <div>
-            <label style={labelStyle}>Email address</label>
+          <div style={field}>
+            <label style={label}>Email address</label>
             <input
               type="email"
               value={form.email}
-              onChange={(e) => updateField("email", e.target.value)}
+              onChange={(e) => update("email", e.target.value)}
               placeholder="you@example.com"
-              style={inputStyle}
+              autoComplete="email"
+              style={inputStyle("email")}
+              onFocus={() => setFocused("email")}
+              onBlur={() => setFocused(null)}
             />
           </div>
 
-          <div>
-            <label style={labelStyle}>Password</label>
+          <div style={field}>
+            <label style={label}>Password</label>
             <input
               type="password"
               value={form.password}
-              onChange={(e) => updateField("password", e.target.value)}
+              onChange={(e) => update("password", e.target.value)}
               placeholder="At least 6 characters"
-              style={inputStyle}
+              style={inputStyle("password")}
+              onFocus={() => setFocused("password")}
+              onBlur={() => setFocused(null)}
             />
           </div>
 
-          <div>
-            <label style={labelStyle}>I want to join as</label>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <div style={field}>
+            <label style={label}>I want to join as</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {["student", "instructor"].map((role) => (
                 <button
                   key={role}
                   type="button"
-                  onClick={() => updateField("role", role)}
+                  onClick={() => update("role", role)}
                   style={{
-                    border: "none",
-                    borderRadius: "18px",
-                    padding: "14px 16px",
-                    fontSize: "14px",
-                    fontWeight: 800,
-                    textTransform: "capitalize",
+                    padding: "11px",
+                    borderRadius: 4,
+                    border: `2px solid ${form.role === role ? "#5f4999" : "#d1d7dc"}`,
+                    background: form.role === role ? "#5f4999" : "#fff",
+                    color: form.role === role ? "#fff" : "#1c1d1f",
+                    fontSize: 14,
+                    fontWeight: 700,
                     cursor: "pointer",
-                    background: form.role === role ? "#6d4ef5" : "#f4ebff",
-                    color: form.role === role ? "white" : "#5d4e98",
-                    transition: "background 0.15s",
+                    textTransform: "capitalize",
+                    transition: "all 0.15s",
+                    fontFamily: "inherit",
                   }}
                 >
-                  {role}
+                  {role === "student" ? "📖 Student" : "🎓 Instructor"}
                 </button>
               ))}
             </div>
           </div>
 
-          {feedback.message && feedback.type === "error" ? (
-            <div
-              style={{
-                borderRadius: "18px",
-                background: "#ffe2eb",
-                padding: "12px 14px",
-                fontSize: "14px",
-                color: "#c0284d",
-              }}
-            >
-              {feedback.message}
+          {error && (
+            <div style={{
+              padding: "12px 14px",
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              borderRadius: 4,
+              fontSize: 14,
+              color: "#dc2626",
+            }}>
+              {error}
             </div>
-          ) : null}
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            style={{ ...buttonStyle, opacity: loading ? 0.75 : 1 }}
+            style={{
+              width: "100%",
+              padding: "13px",
+              background: loading ? "#a89cc8" : "#5f4999",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: loading ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+            }}
           >
             {loading ? "Creating account…" : "Create account"}
           </button>
+
+          <p style={{ margin: 0, fontSize: 12, color: "#6a6f73", textAlign: "center", lineHeight: 1.5 }}>
+            By creating an account, you agree to our Terms of Service.
+          </p>
         </form>
       )}
     </AuthShell>

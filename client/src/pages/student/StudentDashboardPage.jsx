@@ -116,18 +116,23 @@ function ContinueCard({ enrollment }) {
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontWeight: 700,
-            color: "#1a1a2e",
-            fontSize: 14,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
+        <Link
+          to={`/courses/${course._id}`}
+          style={{ textDecoration: "none" }}
         >
-          {course.title}
-        </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: "#1a1a2e",
+              fontSize: 14,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {course.title}
+          </div>
+        </Link>
         <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>
           {course.instructor?.name}
         </div>
@@ -168,7 +173,7 @@ function CourseMinCard({ enrollment }) {
     enrollment.status === "completed" || enrollment.progressPercentage >= 100;
 
   return (
-    <Link to={`/learn/${course._id}`} style={{ textDecoration: "none" }}>
+    <Link to={`/courses/${course._id}`} style={{ textDecoration: "none" }}>
       <div
         style={{
           background: "#fff",

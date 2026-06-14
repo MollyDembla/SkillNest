@@ -3,37 +3,30 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AuthShell from "../../components/auth/AuthShell";
 
-const inputStyle = {
+const field = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+
+const label = {
+  fontSize: 13,
+  fontWeight: 600,
+  color: "#1c1d1f",
+};
+
+const input = {
   width: "100%",
-  borderRadius: "18px",
-  border: "1px solid #eadff8",
-  background: "#fcfaff",
-  padding: "14px 16px",
-  fontSize: "15px",
+  padding: "11px 14px",
+  border: "1.5px solid #d1d7dc",
+  borderRadius: 4,
+  fontSize: 15,
+  color: "#1c1d1f",
+  background: "#fff",
   outline: "none",
-  color: "#3d3666",
   boxSizing: "border-box",
-};
-
-const labelStyle = {
-  display: "block",
-  marginBottom: "8px",
-  fontSize: "14px",
-  fontWeight: 700,
-  color: "#53467f",
-};
-
-const buttonStyle = {
-  width: "100%",
-  border: "none",
-  borderRadius: "18px",
-  padding: "14px 16px",
-  fontSize: "15px",
-  fontWeight: 800,
-  background: "#6d4ef5",
-  color: "white",
-  cursor: "pointer",
-  boxShadow: "0 14px 28px rgba(109, 78, 245, 0.2)",
+  transition: "border-color 0.15s",
+  fontFamily: "inherit",
 };
 
 const roleDestination = {
@@ -49,28 +42,21 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  const [error, setError] = useState("");
+  const [focusedField, setFocusedField] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setFeedback("Please enter your email and password.");
-      return;
-    }
-
+    if (!email || !password) { setError("Please enter your email and password."); return; }
     setLoading(true);
-    setFeedback("");
-
+    setError("");
     try {
       const res = await login({ email, password });
       const role = res?.data?.user?.role || "student";
-      // Redirect to page the user tried to visit, or role default
       const from = location.state?.from?.pathname || roleDestination[role] || "/courses";
       navigate(from, { replace: true });
-    } catch (error) {
-      setFeedback(
-        error?.response?.data?.message || "Login failed. Check your credentials."
-      );
+    } catch (err) {
+      setError(err?.response?.data?.message || "Login failed. Check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -78,71 +64,79 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      eyebrow="Sign in"
-      title="Welcome back"
-      subtitle="Sign in to your SkillNest account to continue learning or managing your courses."
+      title="Log in to your account"
+      subtitle="Welcome back! Enter your credentials to continue."
       footer={
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Link
-            to="/auth/register"
-            style={{ color: "#6d4ef5", fontWeight: 700, textDecoration: "none" }}
-          >
-            Create account
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+          <Link to="/auth/register" style={{ color: "#5f4999", fontWeight: 600, textDecoration: "none" }}>
+            New to SkillNest? Sign up
           </Link>
-          <Link
-            to="/auth/forgot-password"
-            style={{ color: "#6d4ef5", fontWeight: 700, textDecoration: "none" }}
-          >
+          <Link to="/auth/forgot-password" style={{ color: "#5f4999", fontWeight: 600, textDecoration: "none" }}>
             Forgot password?
           </Link>
         </div>
       }
     >
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
-        <div>
-          <label style={labelStyle}>Email address</label>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div style={field}>
+          <label style={label}>Email address</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            style={inputStyle}
             autoComplete="email"
+            style={{ ...input, borderColor: focusedField === "email" ? "#5f4999" : "#d1d7dc" }}
+            onFocus={() => setFocusedField("email")}
+            onBlur={() => setFocusedField(null)}
           />
         </div>
 
-        <div>
-          <label style={labelStyle}>Password</label>
+        <div style={field}>
+          <label style={label}>Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Your password"
-            style={inputStyle}
             autoComplete="current-password"
+            style={{ ...input, borderColor: focusedField === "password" ? "#5f4999" : "#d1d7dc" }}
+            onFocus={() => setFocusedField("password")}
+            onBlur={() => setFocusedField(null)}
           />
         </div>
 
-        {feedback ? (
-          <div
-            style={{
-              borderRadius: "18px",
-              background: "#ffe2eb",
-              padding: "12px 14px",
-              fontSize: "14px",
-              color: "#c0284d",
-            }}
-          >
-            {feedback}
+        {error && (
+          <div style={{
+            padding: "12px 14px",
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            borderRadius: 4,
+            fontSize: 14,
+            color: "#dc2626",
+          }}>
+            {error}
           </div>
-        ) : null}
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          style={{ ...buttonStyle, opacity: loading ? 0.75 : 1 }}
+          style={{
+            width: "100%",
+            padding: "13px",
+            background: loading ? "#a89cc8" : "#5f4999",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? "not-allowed" : "pointer",
+            transition: "background 0.15s",
+            fontFamily: "inherit",
+          }}
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Signing in…" : "Log in"}
         </button>
       </form>
     </AuthShell>

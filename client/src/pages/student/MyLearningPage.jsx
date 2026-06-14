@@ -174,18 +174,23 @@ function EnrollmentCard({ enrollment }) {
       {/* Body */}
       <div style={{ padding: "16px 18px 18px", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
         <div>
-          <h3
-            style={{
-              margin: 0, fontSize: 15, fontWeight: 800, color: purpleDark,
-              lineHeight: 1.35,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
+          <Link
+            to={`/courses/${course?._id}`}
+            style={{ textDecoration: "none" }}
           >
-            {course?.title || "Untitled Course"}
-          </h3>
+            <h3
+              style={{
+                margin: 0, fontSize: 15, fontWeight: 800, color: purpleDark,
+                lineHeight: 1.35,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {course?.title || "Untitled Course"}
+            </h3>
+          </Link>
           {course?.instructor?.name && (
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9b8ec4" }}>
               {course.instructor.name}

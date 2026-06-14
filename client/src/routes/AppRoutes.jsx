@@ -44,19 +44,19 @@ import PlatformAnalyticsPage from "../pages/admin/PlatformAnalyticsPage";
 // Shared
 import MessagesPage from "../pages/chat/MessagesPage";
 import NotificationsPage from "../pages/notifications/NotificationsPage";
+import HomePage from "../pages/HomePage";
+import InstructorChatPage from "../pages/instructor/InstructorChatPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 function HomeRedirect() {
   const { user, initializing } = useAuth();
   if (initializing) return null;
-  if (user) {
-    if (user.role === "student") return <Navigate to="/dashboard" replace />;
-    if (user.role === "instructor") return <Navigate to="/instructor/dashboard" replace />;
-    if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
-    return <Navigate to="/courses" replace />;
-  }
-  return <Navigate to="/auth/login" replace />;
+  if (!user) return <HomePage />;
+  if (user.role === "student") return <Navigate to="/dashboard" replace />;
+  if (user.role === "instructor") return <Navigate to="/instructor/dashboard" replace />;
+  if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
+  return <Navigate to="/courses" replace />;
 }
 
 export default function AppRoutes() {
@@ -98,6 +98,7 @@ export default function AppRoutes() {
         <Route path="/instructor/courses/:courseId/edit" element={<CourseEditPage />} />
         <Route path="/instructor/analytics" element={<InstructorAnalyticsPage />} />
         <Route path="/instructor/profile" element={<InstructorProfilePage />} />
+        <Route path="/instructor/messages" element={<InstructorChatPage />} />
       </Route>
 
       {/* Any authenticated user */}

@@ -126,19 +126,21 @@ const refresh = async (refreshToken) => {
 };
 
 /**
- * Send password reset email
+ * Generate a password reset token and return the reset URL directly.
+ * No email is sent — the caller receives the URL to present to the user.
  * @param {string} email
  */
 const forgotPassword = async (email) => {
   const user = await User.findOne({ email });
   if (!user) {
-    throw new ApiError(404, 'No user found with this email address.');
+    throw new ApiError(404, 'No account found with that email address.');
   }
 
   const resetToken = user.getResetPasswordToken();
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
-  await emailService.sendPasswordResetEmail(user, resetToken);
+  const resetUrl = `${config.clientUrl}/auth/reset-password?token=${resetToken}`;
+  return { resetUrl, name: user.name };
 };
 
 /**

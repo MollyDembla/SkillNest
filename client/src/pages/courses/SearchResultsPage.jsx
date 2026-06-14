@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getCourses } from "../../services/courseService";
+import CourseCard from "../../components/course/CourseCard";
 
 const purple = "#5f4999";
-const purpleDark = "#3c3168";
 const purpleLight = "#ede9f8";
 
 const LEVELS = ["all", "beginner", "intermediate", "advanced"];
@@ -14,46 +14,6 @@ const SORTS = [
   { value: "price_asc", label: "Price: Low to High" },
   { value: "price_desc", label: "Price: High to Low" },
 ];
-
-function CourseCard({ course }) {
-  return (
-    <Link
-      to={`/courses/${course._id}`}
-      style={{ textDecoration: "none", display: "block", background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 12px rgba(95,73,153,0.08)", border: "1.5px solid #f0edf8", transition: "box-shadow 0.15s" }}
-      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 32px rgba(95,73,153,0.16)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 2px 12px rgba(95,73,153,0.08)"; }}
-    >
-      {course.thumbnail ? (
-        <div style={{ height: 160, overflow: "hidden", background: purpleLight }}>
-          <img src={course.thumbnail} alt={course.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        </div>
-      ) : (
-        <div style={{ height: 160, background: `linear-gradient(135deg, ${purpleLight}, #ddd8f8)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>📚</div>
-      )}
-      <div style={{ padding: "14px 16px" }}>
-        <p style={{ margin: "0 0 4px", fontSize: 11, color: purple, fontWeight: 700, textTransform: "capitalize" }}>
-          {course.category} · {course.level}
-        </p>
-        <h3 style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 800, color: "#1a1a2e", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-          {course.title}
-        </h3>
-        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#6b7280" }}>
-          {course.instructor?.name}
-        </p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {course.averageRating > 0 && (
-            <span style={{ fontSize: 12, color: "#92400e", fontWeight: 700 }}>
-              ⭐ {course.averageRating.toFixed(1)} ({course.reviewsCount})
-            </span>
-          )}
-          <span style={{ fontSize: 16, fontWeight: 900, color: purpleDark, marginLeft: "auto" }}>
-            {course.price === 0 ? "Free" : `$${course.price.toFixed(2)}`}
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 export default function SearchResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -104,9 +64,9 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f7f5ff", paddingBottom: 60 }}>
+    <div style={{ minHeight: "100vh", background: "#f7f9fa", paddingBottom: 60 }}>
       {/* Header */}
-      <div style={{ background: `linear-gradient(135deg, ${purpleDark} 0%, ${purple} 100%)`, padding: "40px 24px 32px" }}>
+      <div style={{ background: "#1c1d1f", padding: "40px 24px 32px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: "0 0 16px" }}>
             {q ? `Results for "${q}"` : "Search Courses"}
@@ -120,7 +80,7 @@ export default function SearchResultsPage() {
             />
             <button
               type="submit"
-              style={{ padding: "12px 24px", background: "#fff", color: purple, border: "none", borderRadius: 12, fontWeight: 800, fontSize: 14, cursor: "pointer" }}
+              style={{ padding: "12px 24px", background: "#5f4999", color: "#fff", border: "none", borderRadius: "0 4px 4px 0", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
             >
               Search
             </button>

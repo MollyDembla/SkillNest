@@ -18,7 +18,7 @@ function AppChrome() {
     location.pathname.startsWith("/learn/");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: "#fff" }}>
       {!hideNav ? <Navbar /> : null}
       <main>
         <AppRoutes />
