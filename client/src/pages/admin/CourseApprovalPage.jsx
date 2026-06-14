@@ -11,8 +11,23 @@ function RejectModal({ course, onConfirm, onClose, loading }) {
   const [reason, setReason] = useState("");
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#fff", borderRadius: 20, padding: "28px 28px", width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>✕</div>
+      <div style={{ position: "relative", background: "#fff", borderRadius: 20, padding: "28px 28px", width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }} onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute", top: 20, right: 20,
+            background: "none", border: "none", cursor: "pointer",
+            color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 6, borderRadius: "50%", transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f4f6")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: 18, fontWeight: 800 }}>Reject Course</h2>
         <p style={{ margin: "0 0 16px", color: "#6b7280", fontSize: 13 }}>
           "<strong style={{ color: "#1a1a2e" }}>{course.title}</strong>" will be rejected and the instructor notified.
@@ -116,7 +131,6 @@ export default function CourseApprovalPage() {
           </div>
         ) : courses.length === 0 ? (
           <div style={{ textAlign: "center", paddingTop: 60 }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
             <p style={{ color: "#9ca3af", fontSize: 15, fontWeight: 600 }}>No pending courses</p>
             <p style={{ color: "#9ca3af", fontSize: 13 }}>All submissions have been reviewed.</p>
           </div>
@@ -127,7 +141,9 @@ export default function CourseApprovalPage() {
                 {course.thumbnail ? (
                   <img src={course.thumbnail} alt="" style={{ width: 100, height: 70, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
                 ) : (
-                  <div style={{ width: 100, height: 70, background: purpleLight, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>📚</div>
+                  <div style={{ width: 100, height: 70, background: purpleLight, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: 11, color: purple, fontWeight: 700 }}>No image</span>
+                  </div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
@@ -156,14 +172,14 @@ export default function CourseApprovalPage() {
                     disabled={actionLoading}
                     style={{ padding: "8px 18px", background: "#16a34a", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: actionLoading ? "not-allowed" : "pointer", opacity: actionLoading ? 0.7 : 1 }}
                   >
-                    ✓ Approve
+                    Approve
                   </button>
                   <button
                     onClick={() => setRejectTarget(course)}
                     disabled={actionLoading}
                     style={{ padding: "8px 18px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: actionLoading ? "not-allowed" : "pointer", opacity: actionLoading ? 0.7 : 1 }}
                   >
-                    ✕ Reject
+                    Reject
                   </button>
                 </div>
               </div>

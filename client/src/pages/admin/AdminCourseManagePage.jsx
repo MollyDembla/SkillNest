@@ -63,13 +63,29 @@ function RejectModal({ course, onConfirm, onClose, loading }) {
     >
       <div
         style={{
+          position: "relative",
           background: "#fff", borderRadius: 18, padding: "30px 28px",
           width: "100%", maxWidth: 440,
           boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: 32, marginBottom: 10 }}>✕</div>
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute", top: 20, right: 20,
+            background: "none", border: "none", cursor: "pointer",
+            color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 6, borderRadius: "50%", transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f4f6")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: 18, fontWeight: 800 }}>
           Reject Course
         </h2>
@@ -143,7 +159,7 @@ function DeleteModal({ course, onConfirm, onClose, loading }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: 32, marginBottom: 10 }}>🗑️</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#dc2626", marginBottom: 10 }}>Delete Course</div>
         <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: 18, fontWeight: 800 }}>
           Delete Course
         </h2>
@@ -192,12 +208,12 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
             style={{
               width: 52, height: 38, borderRadius: 8, overflow: "hidden",
               background: "#e9e4f7", flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12,
             }}
           >
             {course.thumbnail
               ? <img src={course.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : "📚"}
+              : <span style={{ color: "#9ca3af", fontWeight: 700, fontSize: 10 }}>No img</span>}
           </div>
           <div style={{ minWidth: 0 }}>
             <div
@@ -250,7 +266,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
                   cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
                 }}
               >
-                ✓ Approve
+                Approve
               </button>
               <button
                 onClick={() => onReject(course)}
@@ -261,7 +277,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
                   cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
                 }}
               >
-                ✕ Reject
+                Reject
               </button>
             </>
           )}
@@ -276,7 +292,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
                 cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
               }}
             >
-              ⊘ Unpublish
+              Unpublish
             </button>
           )}
 
@@ -300,7 +316,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
               cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
             }}
           >
-            🗑
+            Delete
           </button>
         </div>
       </td>
@@ -443,7 +459,7 @@ export default function AdminCourseManagePage() {
             </div>
             {pendingCount > 0 && (
               <div style={{ background: "#fef3c7", borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700, color: "#92400e" }}>
-                ⏳ {pendingCount} pending in current view
+                {pendingCount} pending in current view
               </div>
             )}
           </div>
@@ -504,7 +520,6 @@ export default function AdminCourseManagePage() {
             </div>
           ) : courses.length === 0 ? (
             <div style={{ padding: "64px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
               <h3 style={{ color: "#1a1a2e", margin: "0 0 6px" }}>No courses found</h3>
               <p style={{ color: "#6b7280", margin: 0, fontSize: 14 }}>
                 {search ? "Try a different search term." : `No ${activeTab === "all" ? "" : activeTab + " "}courses yet.`}

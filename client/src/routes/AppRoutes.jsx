@@ -104,6 +104,8 @@ export default function AppRoutes() {
       {/* Any authenticated user */}
       <Route element={<ProtectedRoute />}>
         <Route path="/messages" element={<MessagesPage />} />
+      </Route>
+      <Route element={<ProtectedRoute allowedRoles={["instructor"]} />}>
         <Route path="/notifications" element={<NotificationsPage />} />
       </Route>
 

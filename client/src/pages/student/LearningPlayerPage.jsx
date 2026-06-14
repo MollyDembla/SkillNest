@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getCourseById } from "../../services/courseService";
 import { checkEnrollment } from "../../services/enrollmentService";
@@ -50,7 +50,9 @@ function VideoPlayer({ lesson, onEnded }) {
           gap: 12,
         }}
       >
-        <span style={{ fontSize: 48, opacity: 0.15 }}>▶</span>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.15, color: "#fff" }}>
+          <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+        </svg>
         <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.25)" }}>
           No video for this lesson yet.
         </p>
@@ -212,8 +214,14 @@ function CompletionOverlay({ courseName, onClose }) {
           animation: "popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
         }}
       >
-        <div style={{ fontSize: 64, marginBottom: 16, animation: "float 2s ease-in-out infinite" }}>
-          🎉
+        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: "50%", background: "rgba(124,92,191,0.2)", color: "#a78be8", marginBottom: 20, animation: "float 2s ease-in-out infinite" }}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path>
+            <path d="M12 2a6 6 0 0 1 6 6v3.34c0 2.21-1.79 4-4 4h-4c-2.21 0-4-1.79-4-4V8a6 6 0 0 1 6-6z"></path>
+          </svg>
         </div>
         <h2 style={{ margin: "0 0 10px", fontSize: 24, fontWeight: 900, color: "#fff" }}>
           Course Complete!
@@ -274,11 +282,14 @@ function CompletionOverlay({ courseName, onClose }) {
 // ─── main page ───────────────────────────────────────────────
 export default function LearningPlayerPage() {
   const { courseId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [enrolled, setEnrolled] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
   const [completedLessons, setCompletedLessons] = useState(new Set());
@@ -307,23 +318,38 @@ export default function LearningPlayerPage() {
         setLessons(loadedLessons);
         setEnrolled(isEnrolled);
 
+        // Check if a specific lesson was requested via ?lesson= query param
+        const lessonParam = searchParams.get("lesson");
+        const requestedIdx = lessonParam !== null ? parseInt(lessonParam, 10) : -1;
+
         if (isEnrolled && progressRes.data) {
           const completed = new Set(progressRes.data.completedLessons || []);
           setCompletedLessons(completed);
           setProgressPercentage(progressRes.data.progressPercentage || 0);
 
-          const currentLessonId = progressRes.data.currentLesson;
-          if (currentLessonId) {
-            const idx = loadedLessons.findIndex((l) => l._id === currentLessonId);
-            // If currently at last lesson, stay there; otherwise resume at next incomplete
-            if (idx !== -1) {
-              const alreadyComplete = completed.has(currentLessonId);
-              const nextIdx = alreadyComplete
-                ? loadedLessons.findIndex((l) => !completed.has(l._id))
-                : idx;
-              setActiveLessonIndex(nextIdx !== -1 ? nextIdx : idx);
+          // Prioritize the ?lesson= param; fallback to progress-based resume
+          if (requestedIdx >= 0 && requestedIdx < loadedLessons.length) {
+            setActiveLessonIndex(requestedIdx);
+          } else {
+            const currentLessonId = progressRes.data.currentLesson;
+            if (currentLessonId) {
+              const idx = loadedLessons.findIndex((l) => l._id === currentLessonId);
+              if (idx !== -1) {
+                const alreadyComplete = completed.has(currentLessonId);
+                const nextIdx = alreadyComplete
+                  ? loadedLessons.findIndex((l) => !completed.has(l._id))
+                  : idx;
+                setActiveLessonIndex(nextIdx !== -1 ? nextIdx : idx);
+              }
             }
           }
+        } else if (requestedIdx >= 0 && requestedIdx < loadedLessons.length) {
+          setActiveLessonIndex(requestedIdx);
+        }
+
+        // Clear the query param so refresh doesn't re-apply it
+        if (lessonParam !== null) {
+          setSearchParams({}, { replace: true });
         }
       } catch {
         setEnrolled(false);
@@ -430,7 +456,12 @@ export default function LearningPlayerPage() {
             width: "100%",
           }}
         >
-          <div style={{ fontSize: 52, marginBottom: 16 }}>🔒</div>
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", color: "#dc2626", marginBottom: 20 }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
           <h2 style={{ margin: "0 0 10px", fontSize: 22, fontWeight: 900, color: "#3c3168" }}>
             Not enrolled
           </h2>
@@ -477,25 +508,37 @@ export default function LearningPlayerPage() {
           display: "flex",
           alignItems: "center",
           gap: 14,
-          padding: "12px 20px",
+          padding: "0 20px",
+          height: 56,
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           flexShrink: 0,
           background: "#16121f",
         }}
       >
-        <Link
-          to="/my-learning"
+        <button
+          onClick={() => navigate(`/courses/${courseId}`)}
           style={{
-            fontSize: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 13,
             fontWeight: 700,
-            color: "rgba(255,255,255,0.4)",
-            textDecoration: "none",
+            color: "rgba(255,255,255,0.5)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
             whiteSpace: "nowrap",
             flexShrink: 0,
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
         >
-          ← My Learning
-        </Link>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+          </svg>
+          Course Details
+        </button>
 
         <h1
           style={{
@@ -561,12 +604,18 @@ export default function LearningPlayerPage() {
       <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
         {/* Main content */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
 
           {/* Video */}
-          <VideoPlayer lesson={activeLesson} onEnded={handleMarkComplete} />
+          <div style={{ background: "#0d0b14", flexShrink: 0 }}>
+            <div style={{ maxWidth: 960, margin: "0 auto", padding: "0" }}>
+              <VideoPlayer lesson={activeLesson} onEnded={handleMarkComplete} />
+            </div>
+          </div>
 
-          {/* Lesson header */}
+          {/* Content below video */}
+          <div style={{ flex: 1, padding: "0 24px 40px" }}>
+
           <div
             style={{
               marginTop: 20,
@@ -637,109 +686,184 @@ export default function LearningPlayerPage() {
             </button>
           </div>
 
-          {/* Description */}
-          {activeLesson?.description && (
-            <div
-              style={{
-                marginTop: 20,
-                borderRadius: 12,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                padding: "18px 20px",
-              }}
-            >
-              <h4 style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                About this lesson
-              </h4>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: "rgba(255,255,255,0.6)" }}>
-                {activeLesson.description}
-              </p>
+            {/* Tab nav */}
+            <div style={{ display: "flex", gap: 0, marginTop: 20, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              {[{ id: "overview", label: "Overview" }, { id: "resources", label: "Resources" }].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderBottom: activeTab === tab.id ? "2px solid #7c5cbf" : "2px solid transparent",
+                    color: activeTab === tab.id ? "#a78be8" : "rgba(255,255,255,0.4)",
+                    padding: "10px 16px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    marginBottom: -1,
+                    transition: "color 0.15s, border-color 0.15s",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-          )}
 
-          {/* Resources */}
-          {activeLesson?.resources?.length > 0 && (
-            <div
-              style={{
-                marginTop: 12,
-                borderRadius: 12,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                padding: "18px 20px",
-              }}
-            >
-              <h4 style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Resources
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {activeLesson.resources.map((r, i) => (
-                  <a
-                    key={i}
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: 13,
-                      color: "#a78be8",
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      fontWeight: 600,
-                    }}
-                  >
-                    <span style={{ fontSize: 16 }}>📎</span> {r.title || r.url}
-                  </a>
-                ))}
-              </div>
+            {/* Tab content */}
+            <div style={{ marginTop: 20 }}>
+              {activeTab === "overview" && (
+                <div>
+                  {activeLesson?.description ? (
+                    <div
+                      style={{
+                        borderRadius: 12,
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        padding: "18px 20px",
+                        marginBottom: 16,
+                      }}
+                    >
+                      <h4 style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        About this lesson
+                      </h4>
+                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: "rgba(255,255,255,0.6)" }}>
+                        {activeLesson.description}
+                      </p>
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No description available.</p>
+                  )}
+
+                  {/* Course overview */}
+                  {course?.description && (
+                    <div
+                      style={{
+                        borderRadius: 12,
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        padding: "18px 20px",
+                      }}
+                    >
+                      <h4 style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        Course Description
+                      </h4>
+                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: "rgba(255,255,255,0.6)" }}>
+                        {course.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+
+              {activeTab === "resources" && (
+                <div>
+                  {activeLesson?.resources?.length > 0 ? (
+                    <div
+                      style={{
+                        borderRadius: 12,
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        padding: "18px 20px",
+                      }}
+                    >
+                      <h4 style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        Lesson Resources
+                      </h4>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {activeLesson.resources.map((r, i) => (
+                          <a
+                            key={i}
+                            href={r.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: 13,
+                              color: "#a78be8",
+                              textDecoration: "none",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              fontWeight: 600,
+                              padding: "8px 12px",
+                              borderRadius: 8,
+                              background: "rgba(124,92,191,0.1)",
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                            </svg> {r.title || r.url}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No resources for this lesson.</p>
+                  )}
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Prev / Next nav */}
-          <div style={{ marginTop: 28, display: "flex", justifyContent: "space-between", gap: 12 }}>
-            <button
-              onClick={() => setActiveLessonIndex((i) => Math.max(0, i - 1))}
-              disabled={activeLessonIndex === 0}
-              style={{
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 12,
-                padding: "10px 20px",
-                background: "transparent",
-                color: "rgba(255,255,255,0.45)",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: activeLessonIndex === 0 ? "not-allowed" : "pointer",
-                opacity: activeLessonIndex === 0 ? 0.3 : 1,
-              }}
-            >
-              ← Previous
-            </button>
-            <button
-              onClick={() =>
-                setActiveLessonIndex((i) => Math.min(totalLessons - 1, i + 1))
-              }
-              disabled={activeLessonIndex === totalLessons - 1}
-              style={{
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 12,
-                padding: "10px 20px",
-                background:
-                  activeLessonIndex === totalLessons - 1
-                    ? "transparent"
-                    : "rgba(124,92,191,0.25)",
-                color:
-                  activeLessonIndex === totalLessons - 1
-                    ? "rgba(255,255,255,0.45)"
-                    : "#a78be8",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor:
-                  activeLessonIndex === totalLessons - 1 ? "not-allowed" : "pointer",
-                opacity: activeLessonIndex === totalLessons - 1 ? 0.3 : 1,
-              }}
-            >
-              Next →
-            </button>
+
+            {/* Prev / Next nav */}
+            <div style={{ marginTop: 28, display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <button
+                onClick={() => setActiveLessonIndex((i) => Math.max(0, i - 1))}
+                disabled={activeLessonIndex === 0}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: "10px 20px",
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.45)",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: activeLessonIndex === 0 ? "not-allowed" : "pointer",
+                  opacity: activeLessonIndex === 0 ? 0.3 : 1,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+                </svg>
+                Previous
+              </button>
+              <button
+                onClick={() =>
+                  setActiveLessonIndex((i) => Math.min(totalLessons - 1, i + 1))
+                }
+                disabled={activeLessonIndex === totalLessons - 1}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: "10px 20px",
+                  background:
+                    activeLessonIndex === totalLessons - 1
+                      ? "transparent"
+                      : "rgba(124,92,191,0.25)",
+                  color:
+                    activeLessonIndex === totalLessons - 1
+                      ? "rgba(255,255,255,0.45)"
+                      : "#a78be8",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor:
+                    activeLessonIndex === totalLessons - 1 ? "not-allowed" : "pointer",
+                  opacity: activeLessonIndex === totalLessons - 1 ? 0.3 : 1,
+                }}
+              >
+                Next
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 

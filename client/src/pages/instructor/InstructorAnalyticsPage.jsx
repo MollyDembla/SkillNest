@@ -221,10 +221,10 @@ function CourseRow({ course, rank }) {
           <span style={{ fontSize: 11, fontWeight: 800, color: "#9ca3af", width: 20, textAlign: "center", flexShrink: 0 }}>
             #{rank}
           </span>
-          <div style={{ width: 44, height: 32, borderRadius: 7, overflow: "hidden", background: "#e9e4f7", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+          <div style={{ width: 44, height: 32, borderRadius: 7, overflow: "hidden", background: "#e9e4f7", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             {course.thumbnail
               ? <img src={course.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : "📚"}
+              : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={purple} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>}
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a2e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 220 }}>
@@ -322,7 +322,11 @@ export default function InstructorAnalyticsPage() {
   if (error) {
     return (
       <div style={{ maxWidth: 480, margin: "80px auto", textAlign: "center", padding: "0 24px" }}>
-        <div style={{ fontSize: 48 }}>⚠️</div>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
         <h2 style={{ color: purpleDark }}>Something went wrong</h2>
         <p style={{ color: "#6b7280" }}>{error}</p>
         <button onClick={() => window.location.reload()} style={{ background: purple, color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontWeight: 700, cursor: "pointer" }}>
@@ -337,7 +341,11 @@ export default function InstructorAnalyticsPage() {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f7f5ff" }}>
         <div style={{ textAlign: "center", maxWidth: 420, padding: "0 24px" }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>📊</div>
+          <div style={{ width: 72, height: 72, borderRadius: "50%", background: purpleLight, color: purple, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+          </div>
           <h2 style={{ color: purpleDark, margin: "0 0 10px", fontWeight: 900 }}>No data yet</h2>
           <p style={{ color: "#6b7280", margin: "0 0 24px", lineHeight: 1.7 }}>
             Analytics will appear once you publish your first course and get enrollments.
@@ -401,11 +409,55 @@ export default function InstructorAnalyticsPage() {
 
         {/* ── KPI cards ── */}
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 24 }}>
-          <KpiCard icon="💰" label="Total Revenue" value={fmtMoney(stats.totalRevenue)} color={green} highlight />
-          <KpiCard icon="👥" label="Total Students" value={fmt(stats.totalStudents)} color="#0ea5e9" />
-          <KpiCard icon="📋" label="Enrollments" value={fmt(stats.totalEnrollments)} color={purple} />
-          <KpiCard icon="⭐" label="Avg Rating" value={stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "—"} sub={totalReviews > 0 ? `${totalReviews} reviews` : "No reviews yet"} color="#f59e0b" />
-          <KpiCard icon="🏆" label="Completion Rate" value={`${stats.completionRate}%`} sub={`${stats.totalCompleted} completed`} color="#8b5cf6" />
+          <KpiCard
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+              </svg>
+            }
+            label="Total Revenue" value={fmtMoney(stats.totalRevenue)} color={green} highlight
+          />
+          <KpiCard
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                <path d="M16 3.13a4 4 0 010 7.75" />
+              </svg>
+            }
+            label="Total Students" value={fmt(stats.totalStudents)} color="#0ea5e9"
+          />
+          <KpiCard
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            }
+            label="Enrollments" value={fmt(stats.totalEnrollments)} color={purple}
+          />
+          <KpiCard
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            }
+            label="Avg Rating" value={stats.avgRating > 0 ? stats.avgRating.toFixed(1) : "—"} sub={totalReviews > 0 ? `${totalReviews} reviews` : "No reviews yet"} color="#f59e0b"
+          />
+          <KpiCard
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+              </svg>
+            }
+            label="Completion Rate" value={`${stats.completionRate}%`} sub={`${stats.totalCompleted} completed`} color="#8b5cf6"
+          />
         </div>
 
         {/* ── Charts row ── */}
@@ -420,7 +472,9 @@ export default function InstructorAnalyticsPage() {
                   Last {period} days · {enrollmentsSeries.reduce((s, d) => s + d.count, 0)} total
                 </p>
               </div>
-              <span style={{ fontSize: 20 }}>📋</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={purple} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
+              </svg>
             </div>
             <BarChart data={enrollmentsSeries} valueKey="count" color={purple} formatValue={(v) => `${v} enrollment${v !== 1 ? "s" : ""}`} height={130} />
           </div>
@@ -434,7 +488,9 @@ export default function InstructorAnalyticsPage() {
                   Last {period} days · {fmtMoney(revenueSeries.reduce((s, d) => s + d.amount, 0))} total
                 </p>
               </div>
-              <span style={{ fontSize: 20 }}>💰</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+              </svg>
             </div>
             <BarChart data={revenueSeries} valueKey="amount" color={green} formatValue={(v) => fmtMoney(v)} height={130} />
           </div>

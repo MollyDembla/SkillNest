@@ -26,7 +26,7 @@ function timeAgo(date) {
   return new Date(date).toLocaleDateString();
 }
 
-function StatCard({ label, value, icon, color }) {
+function StatCard({ label, value, color, svgPath }) {
   return (
     <div
       style={{
@@ -50,11 +50,12 @@ function StatCard({ label, value, icon, color }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 22,
           flexShrink: 0,
         }}
       >
-        {icon}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {svgPath}
+        </svg>
       </div>
       <div>
         <div style={{ fontSize: 26, fontWeight: 800, color: "#1a1a2e", lineHeight: 1 }}>
@@ -109,10 +110,12 @@ function CourseRow({ course }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 18,
             }}
           >
-            📚
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9b8ec4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+            </svg>
           </div>
         )}
       </div>
@@ -274,21 +277,18 @@ export default function InstructorDashboardPage() {
   if (error) {
     return (
       <div style={{ maxWidth: 600, margin: "80px auto", textAlign: "center", padding: "0 24px" }}>
-        <div style={{ fontSize: 48 }}>⚠️</div>
-        <h2 style={{ color: "#1a1a2e", marginTop: 12 }}>Something went wrong</h2>
-        <p style={{ color: "#6b7280" }}>{error}</p>
+        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", color: "#dc2626", marginBottom: 20 }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <h2 style={{ color: "#1a1a2e", margin: "0 0 10px", fontSize: 22, fontWeight: 900 }}>Something went wrong</h2>
+        <p style={{ color: "#6b7280", margin: "0 0 20px" }}>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          style={{
-            marginTop: 16,
-            background: purple,
-            color: "#fff",
-            border: "none",
-            borderRadius: 10,
-            padding: "10px 24px",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
+          style={{ background: purple, color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontWeight: 700, cursor: "pointer" }}
         >
           Try again
         </button>
@@ -332,7 +332,7 @@ export default function InstructorDashboardPage() {
           </div>
           <div>
             <h1 style={{ color: "#fff", margin: 0, fontSize: 28, fontWeight: 800 }}>
-              Welcome back, {firstName}! 👨‍🏫
+              Welcome back, {firstName}!
             </h1>
             <p style={{ color: "rgba(255,255,255,0.75)", margin: "6px 0 0", fontSize: 15 }}>
               {stats.publishedCourses === 0
@@ -346,20 +346,26 @@ export default function InstructorDashboardPage() {
       <div style={{ maxWidth: 1100, margin: "-32px auto 0", padding: "0 24px" }}>
         {/* Stats */}
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 36 }}>
-          <StatCard label="Total Courses" value={stats.totalCourses} icon="📚" color={purple} />
-          <StatCard label="Published" value={stats.publishedCourses} icon="✅" color="#16a34a" />
-          <StatCard label="Total Students" value={stats.totalStudents} icon="👥" color="#0ea5e9" />
+          <StatCard label="Total Courses" value={stats.totalCourses} color={purple}
+            svgPath={<><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></>}
+          />
+          <StatCard label="Published" value={stats.publishedCourses} color="#16a34a"
+            svgPath={<><polyline points="20 6 9 17 4 12"/></>}
+          />
+          <StatCard label="Total Students" value={stats.totalStudents} color="#0ea5e9"
+            svgPath={<><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></>}
+          />
           <StatCard
             label="Total Revenue"
             value={`$${stats.totalRevenue.toFixed(2)}`}
-            icon="💰"
             color="#f97316"
+            svgPath={<><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></>}
           />
           <StatCard
             label="Avg Rating"
-            value={stats.averageRating > 0 ? `${stats.averageRating} ⭐` : "—"}
-            icon="⭐"
+            value={stats.averageRating > 0 ? stats.averageRating : "—"}
             color="#eab308"
+            svgPath={<><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></>}
           />
         </div>
 
@@ -404,7 +410,12 @@ export default function InstructorDashboardPage() {
             >
               {courses.length === 0 ? (
                 <div style={{ padding: "48px 24px", textAlign: "center" }}>
-                  <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
+                  <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: "50%", background: purpleLight, color: purple, marginBottom: 16 }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+                    </svg>
+                  </div>
                   <h3 style={{ color: "#1a1a2e", margin: "0 0 8px" }}>No courses yet</h3>
                   <p style={{ color: "#6b7280", margin: "0 0 20px", fontSize: 14 }}>
                     Create your first course to start teaching on SkillNest.
@@ -556,46 +567,7 @@ export default function InstructorDashboardPage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <section style={{ marginTop: 32 }}>
-          <h2 style={{ margin: "0 0 16px", fontSize: 20, fontWeight: 800, color: "#1a1a2e" }}>
-            Quick Actions
-          </h2>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            {[
-              { to: "/instructor/courses/create", label: "✏️ Create Course" },
-              { to: "/instructor/courses", label: "📋 Manage Courses" },
-              { to: "/instructor/analytics", label: "📊 Analytics" },
-              { to: "/courses", label: "🔍 Browse Catalog" },
-            ].map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                style={{
-                  background: "#fff",
-                  color: purple,
-                  border: `2px solid ${purpleLight}`,
-                  borderRadius: 12,
-                  padding: "10px 20px",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  textDecoration: "none",
-                  transition: "border-color 0.15s, background 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = purpleLight;
-                  e.currentTarget.style.borderColor = purple;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#fff";
-                  e.currentTarget.style.borderColor = purpleLight;
-                }}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </section>
+
       </div>
     </div>
   );

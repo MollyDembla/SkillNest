@@ -48,7 +48,7 @@ export default function InstructorProfilePage() {
         const d = res.data.data;
         if (d) setStats({ courses: d.totalCourses ?? 0, students: d.totalStudents ?? 0, revenue: d.totalRevenue ?? 0 });
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user]);
 
   const handleSave = async (e) => {

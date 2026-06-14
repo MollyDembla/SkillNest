@@ -187,7 +187,7 @@ function DeleteModal({ user, onConfirm, onClose, loading }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#dc2626", marginBottom: 12 }}>Delete User</div>
         <h2 style={{ margin: "0 0 8px", color: "#1a1a2e", fontSize: 18, fontWeight: 800 }}>
           Delete User
         </h2>
@@ -281,17 +281,17 @@ function UserRow({ user, currentUserId, onChangeRole, onDelete, actionId }) {
             color: user.isEmailVerified ? "#16a34a" : "#d97706",
           }}
         >
-          {user.isEmailVerified ? "✓ Verified" : "⚠ Unverified"}
+          {user.isEmailVerified ? "Verified" : "Unverified"}
         </span>
       </td>
 
       {/* Stats */}
       <td style={{ padding: "14px 12px", fontSize: 12, color: "#374151", whiteSpace: "nowrap" }}>
         {user.role === "instructor" && (
-          <span style={{ fontWeight: 600 }}>📚 {user.courseCount} course{user.courseCount !== 1 ? "s" : ""}</span>
+          <span style={{ fontWeight: 600 }}>{user.courseCount} course{user.courseCount !== 1 ? "s" : ""}</span>
         )}
         {user.role === "student" && (
-          <span style={{ fontWeight: 600 }}>🎓 {user.enrollmentCount} enrolled</span>
+          <span style={{ fontWeight: 600 }}>{user.enrollmentCount} enrolled</span>
         )}
         {user.role === "admin" && (
           <span style={{ color: "#9ca3af" }}>—</span>
@@ -317,7 +317,7 @@ function UserRow({ user, currentUserId, onChangeRole, onDelete, actionId }) {
               opacity: (busy || isSelf) ? 0.45 : 1,
             }}
           >
-            ✎ Role
+            Role
           </button>
           <button
             onClick={() => onDelete(user)}
@@ -330,7 +330,7 @@ function UserRow({ user, currentUserId, onChangeRole, onDelete, actionId }) {
               opacity: (busy || isSelf) ? 0.45 : 1,
             }}
           >
-            🗑
+            Delete
           </button>
         </div>
       </td>
@@ -483,7 +483,6 @@ export default function AdminUserManagePage() {
             </div>
           ) : users.length === 0 ? (
             <div style={{ padding: "64px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>👤</div>
               <h3 style={{ color: "#1a1a2e", margin: "0 0 6px" }}>No users found</h3>
               <p style={{ color: "#6b7280", margin: 0, fontSize: 14 }}>
                 {search ? "Try a different search term." : `No ${activeTab === "all" ? "" : activeTab + " "}users yet.`}

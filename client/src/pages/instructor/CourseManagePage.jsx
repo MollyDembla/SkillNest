@@ -10,16 +10,16 @@ const purpleLight = "#ede9f8";
 
 const STATUS_CONFIG = {
   published: { bg: "#dcfce7", color: "#16a34a", label: "Published", icon: "✅" },
-  draft:     { bg: "#f3f4f6", color: "#6b7280", label: "Draft",     icon: "📝" },
-  pending:   { bg: "#fef3c7", color: "#d97706", label: "Pending Review", icon: "⏳" },
-  rejected:  { bg: "#fee2e2", color: "#dc2626", label: "Rejected",   icon: "❌" },
+  draft: { bg: "#f3f4f6", color: "#6b7280", label: "Draft", icon: "📝" },
+  pending: { bg: "#fef3c7", color: "#d97706", label: "Pending Review", icon: "⏳" },
+  rejected: { bg: "#fee2e2", color: "#dc2626", label: "Rejected", icon: "❌" },
 };
 
 const SORT_OPTIONS = [
-  { value: "newest",      label: "Newest first" },
-  { value: "oldest",      label: "Oldest first" },
+  { value: "newest", label: "Newest first" },
+  { value: "oldest", label: "Oldest first" },
   { value: "enrollments", label: "Most enrollments" },
-  { value: "revenue",     label: "Highest revenue" },
+  { value: "revenue", label: "Highest revenue" },
 ];
 
 function formatDate(d) {

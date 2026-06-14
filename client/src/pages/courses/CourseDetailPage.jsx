@@ -126,17 +126,25 @@ function ReviewCard({ review, currentUserId, onDelete }) {
 }
 
 // ─── curriculum lesson row ────────────────────────────────────
-function LessonRow({ lesson, index, isEnrolled }) {
+function LessonRow({ lesson, index, isEnrolled, courseId, onLessonClick }) {
   const duration = formatSeconds(lesson.videoDuration);
   return (
     <div
+      onClick={() => onLessonClick(index)}
       style={{
         display: "flex",
         alignItems: "center",
         gap: 12,
         padding: "11px 0",
         borderBottom: "1px solid #f7f5ff",
+        cursor: "pointer",
+        transition: "background 0.15s",
+        borderRadius: 8,
+        paddingLeft: 8,
+        marginLeft: -8,
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "#f7f5ff"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
     >
       <div style={{ width: 26, height: 26, borderRadius: "50%", background: purpleLight, color: purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
         {index + 1}
@@ -477,7 +485,32 @@ export default function CourseDetailPage() {
                 {curriculumOpen && (
                   <div style={{ padding: "8px 28px 4px" }}>
                     {visibleLessons.map((lesson, i) => (
-                      <LessonRow key={lesson._id} lesson={lesson} index={i} isEnrolled={isEnrolled} />
+                      <LessonRow
+                        key={lesson._id}
+                        lesson={lesson}
+                        index={i}
+                        isEnrolled={isEnrolled}
+                        courseId={courseId}
+                        onLessonClick={(idx) => {
+                          if (isEnrolled) {
+                            navigate(`/learn/${courseId}?lesson=${idx}`);
+                          } else if (!user || user.role === "student") {
+                            if (!user) {
+                              navigate("/auth/login", { state: { from: { pathname: `/courses/${courseId}` } } });
+                            } else {
+                              if (inCart) {
+                                navigate("/cart");
+                              } else {
+                                addToCart(courseId)
+                                  .then(() => navigate("/cart"))
+                                  .catch(() => navigate("/cart"));
+                              }
+                            }
+                          } else {
+                            toast.info("Enrollment not available for your account type.");
+                          }
+                        }}
+                      />
                     ))}
 
                     {lessons.length > 6 && (

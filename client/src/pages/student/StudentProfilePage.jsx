@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/apiClient";
@@ -36,14 +36,15 @@ const inputStyle = {
 
 export default function StudentProfilePage() {
   const { user, setUser } = useAuth();
-  const [form, setForm] = useState({ name: "", bio: "", avatar: "" });
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", bio: "" });
   const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirm: "" });
   const [saving, setSaving] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
   const [certificates, setCertificates] = useState([]);
 
   useEffect(() => {
-    if (user) setForm({ name: user.name || "", bio: user.bio || "", avatar: user.avatar || "" });
+    if (user) setForm({ name: user.name || "", bio: user.bio || "" });
     api.get("/enrollments/certificates")
       .then((res) => setCertificates(res.data.data?.certificates || []))
       .catch(() => {});
@@ -54,7 +55,7 @@ export default function StudentProfilePage() {
     if (!form.name.trim()) return toast.error("Name is required.");
     setSaving(true);
     try {
-      const res = await api.put("/users/profile", { name: form.name.trim(), bio: form.bio.trim(), avatar: form.avatar.trim() });
+      const res = await api.put("/users/profile", { name: form.name.trim(), bio: form.bio.trim() });
       const updated = res.data.data?.user;
       if (updated && setUser) setUser(updated);
       toast.success("Profile updated!");
@@ -87,13 +88,30 @@ export default function StudentProfilePage() {
     <div style={{ minHeight: "100vh", background: "#f7f5ff", paddingBottom: 60 }}>
       {/* Header */}
       <div style={{ background: `linear-gradient(135deg, ${purpleDark} 0%, ${purple} 100%)`, padding: "40px 24px 32px" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.15)",
+              border: "none", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.8)",
+              fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 20, transition: "background 0.15s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.25)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#fff", flexShrink: 0, overflow: "hidden", border: "3px solid rgba(255,255,255,0.4)" }}>
             {form.avatar ? <img src={form.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initial}
           </div>
           <div>
             <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 900, margin: 0 }}>{user?.name}</h1>
             <p style={{ color: "rgba(255,255,255,0.7)", margin: "4px 0 0", fontSize: 14 }}>{user?.email}</p>
+          </div>
           </div>
         </div>
       </div>
@@ -108,14 +126,6 @@ export default function StudentProfilePage() {
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 style={inputStyle}
                 placeholder="Your full name"
-              />
-            </Field>
-            <Field label="Avatar URL">
-              <input
-                value={form.avatar}
-                onChange={(e) => setForm((f) => ({ ...f, avatar: e.target.value }))}
-                style={inputStyle}
-                placeholder="https://…"
               />
             </Field>
             <Field label="Bio">
@@ -192,7 +202,12 @@ export default function StudentProfilePage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {certificates.map((cert) => (
                 <div key={cert._id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", background: purpleLight, borderRadius: 14, border: `1.5px solid ${purple}22` }}>
-                  <div style={{ fontSize: 28 }}>🎓</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: "50%", background: "#fff", color: purple, flexShrink: 0, boxShadow: "0 2px 8px rgba(95,73,153,0.06)" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+                    </svg>
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: 14, color: purpleDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {cert.courseNameSnapshot}

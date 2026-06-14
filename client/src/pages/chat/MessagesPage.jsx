@@ -98,8 +98,9 @@ function RoomItem({ room, selected, currentUserId, isOnline, onClick }) {
           </span>
         </div>
         {room.course && (
-          <div style={{ fontSize: 11, color: purple, fontWeight: 600, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            📚 {room.course.title}
+          <div style={{ fontSize: 11, color: purple, fontWeight: 700, marginTop: 2, display: "flex", alignItems: "center", gap: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 9, background: purpleLight, color: purple, padding: "1px 4px", borderRadius: 3, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", flexShrink: 0 }}>Course</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{room.course.title}</span>
           </div>
         )}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4, marginTop: 2 }}>
@@ -171,6 +172,7 @@ function TypingIndicator() {
 
 export default function MessagesPage() {
   const { user } = useAuth();
+  const currentUserId = user?.id || user?._id;
   const { socket, connected, setUnreadCount, isOnline } = useChat();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -279,7 +281,7 @@ export default function MessagesPage() {
     };
 
     const onUserTyping = ({ roomId, userId }) => {
-      if (roomId === selectedRoomId && userId !== user._id) setIsTyping(true);
+      if (roomId === selectedRoomId && userId !== currentUserId) setIsTyping(true);
     };
 
     const onUserStopTyping = ({ roomId }) => {
@@ -305,7 +307,7 @@ export default function MessagesPage() {
       socket.off("user_stop_typing", onUserStopTyping);
       socket.off("new_unread", onNewUnread);
     };
-  }, [socket, selectedRoomId, user._id]);
+  }, [socket, selectedRoomId, currentUserId]);
 
   // Scroll to bottom
   useEffect(() => {
@@ -352,7 +354,7 @@ export default function MessagesPage() {
   const filteredRooms = rooms.filter((room) => {
     if (!search) return true;
     const q = search.toLowerCase();
-    const other = room.participants.find((p) => p._id !== user._id);
+    const other = room.participants.find((p) => p._id !== currentUserId);
     return (
       other?.name?.toLowerCase().includes(q) ||
       room.course?.title?.toLowerCase().includes(q)
@@ -360,7 +362,7 @@ export default function MessagesPage() {
   });
 
   const selectedRoom = rooms.find((r) => r._id === selectedRoomId);
-  const otherUser = selectedRoom?.participants.find((p) => p._id !== user._id);
+  const otherUser = selectedRoom?.participants.find((p) => p._id !== currentUserId);
   const isOtherOnline = isOnline(otherUser?._id);
 
   return (
@@ -381,7 +383,12 @@ export default function MessagesPage() {
             />
           </div>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#9ca3af" }}>🔍</span>
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", color: "#9ca3af" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
             <input
               type="text"
               placeholder="Search conversations…"
@@ -399,7 +406,11 @@ export default function MessagesPage() {
             </div>
           ) : filteredRooms.length === 0 ? (
             <div style={{ padding: "40px 16px", textAlign: "center" }}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
+              <div style={{ display: "inline-flex", color: "#d1d5db", marginBottom: 12 }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.0" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
               <p style={{ fontSize: 13, color: "#9ca3af", margin: 0, lineHeight: 1.6 }}>
                 {search ? "No conversations match." : "No conversations yet.\nMessage an instructor from a course page to get started."}
               </p>
@@ -410,7 +421,7 @@ export default function MessagesPage() {
                 key={room._id}
                 room={room}
                 selected={room._id === selectedRoomId}
-                currentUserId={user._id}
+                currentUserId={currentUserId}
                 isOnline={isOnline}
                 onClick={() => selectRoom(room._id)}
               />
@@ -422,11 +433,15 @@ export default function MessagesPage() {
       {/* ── Thread ── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {!selectedRoomId ? (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: "#9ca3af" }}>
-            <div style={{ fontSize: 56 }}>💬</div>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, color: "#9ca3af" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: "50%", background: "#fff", color: "#d1d5db", boxShadow: "0 4px 20px rgba(95,73,153,0.06)" }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
             <div style={{ fontSize: 16, fontWeight: 800, color: purpleDark }}>Select a conversation</div>
-            <div style={{ fontSize: 13, textAlign: "center", maxWidth: 260, lineHeight: 1.6 }}>
-              Pick a conversation from the left, or start one from a course page.
+            <div style={{ fontSize: 13, textAlign: "center", maxWidth: 280, lineHeight: 1.6, color: "#6a6f73" }}>
+              Pick a conversation from the left sidebar to start chatting.
             </div>
           </div>
         ) : (
@@ -445,8 +460,9 @@ export default function MessagesPage() {
                   )}
                 </div>
                 {selectedRoom?.course && (
-                  <div style={{ fontSize: 11, color: purple, fontWeight: 600, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    📚 {selectedRoom.course.title}
+                  <div style={{ fontSize: 11, color: purple, fontWeight: 700, marginTop: 4, display: "flex", alignItems: "center", gap: 5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 9, background: purpleLight, color: purple, padding: "1px 4px", borderRadius: 3, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", flexShrink: 0 }}>Course</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{selectedRoom.course.title}</span>
                   </div>
                 )}
               </div>
@@ -473,14 +489,14 @@ export default function MessagesPage() {
               )}
 
               {messages.length === 0 && !msgLoading && (
-                <div style={{ textAlign: "center", paddingTop: 60, color: "#9ca3af", fontSize: 13 }}>
-                  No messages yet. Say hello! 👋
+                <div style={{ textAlign: "center", paddingTop: 60, color: "#9ca3af", fontSize: 13, fontWeight: 500 }}>
+                  No messages yet. Send a message to start the conversation!
                 </div>
               )}
 
               {messages.map((msg, i) => {
                 const senderId = msg.sender?._id || msg.sender;
-                const isMine = senderId === user._id;
+                const isMine = senderId === currentUserId;
                 const prevSenderId = messages[i - 1]?.sender?._id || messages[i - 1]?.sender;
                 const showAvatar = !isMine && prevSenderId !== senderId;
                 return (
@@ -531,17 +547,20 @@ export default function MessagesPage() {
                 onClick={handleSend}
                 disabled={!text.trim() || !connected}
                 style={{
-                  width: 44, height: 44, borderRadius: "50%",
+                  width: 40, height: 40, borderRadius: "50%",
                   background: text.trim() && connected ? purple : "#e9e4f7",
                   color: text.trim() && connected ? "#fff" : "#9ca3af",
                   border: "none",
                   cursor: text.trim() && connected ? "pointer" : "not-allowed",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 18, flexShrink: 0,
+                  flexShrink: 0,
                   transition: "background 0.15s",
                 }}
               >
-                ➤
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "rotate(45deg)", marginRight: 2, marginTop: -1 }}>
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
               </button>
             </div>
           </>

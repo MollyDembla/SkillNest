@@ -41,7 +41,7 @@ function timeAgo(date) {
 }
 
 // ─── sub-components ──────────────────────────────────────────
-function StatPill({ icon, value, label, color }) {
+function StatPill({ value, label }) {
   return (
     <div
       style={{
@@ -50,12 +50,11 @@ function StatPill({ icon, value, label, color }) {
         padding: "14px 18px",
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 10,
         flex: "1 1 0",
         minWidth: 130,
       }}
     >
-      <span style={{ fontSize: 22 }}>{icon}</span>
       <div>
         <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{value}</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 3, fontWeight: 600 }}>{label}</div>
@@ -126,9 +125,7 @@ function EnrollmentCard({ enrollment }) {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>
-            📚
-          </div>
+          <div style={{ width: "100%", height: "100%", background: "#e9e4f7" }} />
         )}
 
         {/* Status badge */}
@@ -220,7 +217,7 @@ function EnrollmentCard({ enrollment }) {
 
         {/* CTA */}
         <Link
-          to={`/learn/${course?._id}`}
+          to={`/courses/${course?._id}`}
           style={{
             marginTop: "auto",
             display: "block",
@@ -311,10 +308,10 @@ export default function MyLearningPage() {
           {/* Stats row */}
           {!loading && stats.total > 0 && (
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <StatPill icon="📚" value={stats.total}      label="Total Enrolled" />
-              <StatPill icon="▶️"  value={stats.inProgress} label="In Progress" />
-              <StatPill icon="✅"  value={stats.completed}  label="Completed" />
-              <StatPill icon="🆕"  value={stats.notStarted} label="Not Started" />
+              <StatPill value={stats.total}      label="Total Enrolled" />
+              <StatPill value={stats.inProgress} label="In Progress" />
+              <StatPill value={stats.completed}  label="Completed" />
+              <StatPill value={stats.notStarted} label="Not Started" />
             </div>
           )}
         </div>
@@ -480,7 +477,6 @@ export default function MyLearningPage() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 56, marginBottom: 16 }}>📚</div>
             <h2 style={{ margin: "0 0 10px", fontSize: 22, fontWeight: 900, color: purpleDark }}>
               Your library is empty
             </h2>
@@ -516,7 +512,6 @@ export default function MyLearningPage() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
             <h3 style={{ margin: "0 0 6px", color: purpleDark, fontSize: 18, fontWeight: 800 }}>
               No courses match
             </h3>
@@ -577,7 +572,7 @@ export default function MyLearningPage() {
                 borderRadius: 12,
               }}
             >
-              🔍 Browse more courses
+              Browse more courses
             </Link>
           </div>
         )}
