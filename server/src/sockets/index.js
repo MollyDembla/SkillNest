@@ -1,22 +1,29 @@
+const jwt = require('jsonwebtoken');
+const config = require('../config/env');
 const chatSocket = require('./chatSocket');
 const notificationSocket = require('./notificationSocket');
 const presenceSocket = require('./presenceSocket');
 
-/**
- * Initialize all socket handlers
- * @param {object} io - Socket.io server instance
- */
 const initSockets = (io) => {
-  io.on('connection', (socket) => {
-    console.log(`Socket connection established: ${socket.id}`);
+  // ── Socket auth middleware ────────────────────────────────
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error('Authentication required'));
+    try {
+      const decoded = jwt.verify(token, config.jwtSecret);
+      socket.userId = decoded.id;
+      next();
+    } catch {
+      next(new Error('Invalid token'));
+    }
+  });
 
-    // Register modular socket handlers
+  io.on('connection', (socket) => {
     chatSocket(io, socket);
     notificationSocket(io, socket);
     presenceSocket(io, socket);
 
     socket.on('disconnect', () => {
-      console.log(`Socket connection terminated: ${socket.id}`);
       if (socket.userId) {
         io.emit('user_status_changed', { userId: socket.userId, status: 'offline' });
       }
@@ -24,6 +31,4 @@ const initSockets = (io) => {
   });
 };
 
-module.exports = {
-  initSockets
-};
+module.exports = { initSockets };

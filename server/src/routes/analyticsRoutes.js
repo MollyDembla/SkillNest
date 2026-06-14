@@ -1,9 +1,10 @@
 const express = require('express');
+const { getInstructorAnalytics } = require('../controllers/analyticsController');
+const { protect } = require('../middlewares/authMiddleware');
+const { restrictTo } = require('../middlewares/roleMiddleware');
+
 const router = express.Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-  res.json({ message: 'Stub route active' });
-});
+router.get('/instructor', protect, restrictTo('instructor'), getInstructorAnalytics);
 
 module.exports = router;

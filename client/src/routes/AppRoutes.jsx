@@ -1,0 +1,93 @@
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
+import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
+import CourseCatalogPage from "../pages/courses/CourseCatalogPage";
+import CourseDetailPage from "../pages/courses/CourseDetailPage";
+import CartPage from "../pages/student/CartPage";
+import WishlistPage from "../pages/student/WishlistPage";
+import CheckoutPage from "../pages/student/CheckoutPage";
+import CheckoutSuccessPage from "../pages/student/CheckoutSuccessPage";
+import MyLearningPage from "../pages/student/MyLearningPage";
+import LearningPlayerPage from "../pages/student/LearningPlayerPage";
+import StudentDashboardPage from "../pages/student/StudentDashboardPage";
+import InstructorDashboardPage from "../pages/instructor/InstructorDashboardPage";
+import CourseManagePage from "../pages/instructor/CourseManagePage";
+import CourseCreatePage from "../pages/instructor/CourseCreatePage";
+import CourseEditPage from "../pages/instructor/CourseEditPage";
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import AdminCourseManagePage from "../pages/admin/AdminCourseManagePage";
+import AdminUserManagePage from "../pages/admin/AdminUserManagePage";
+import InstructorAnalyticsPage from "../pages/instructor/InstructorAnalyticsPage";
+import MessagesPage from "../pages/chat/MessagesPage";
+import NotFoundPage from "../pages/NotFoundPage";
+import ProtectedRoute from "./ProtectedRoute";
+
+function HomeRedirect() {
+  const { user, initializing } = useAuth();
+  if (initializing) return null;
+  if (user) {
+    if (user.role === "student") return <Navigate to="/dashboard" replace />;
+    if (user.role === "instructor") return <Navigate to="/instructor/dashboard" replace />;
+    if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/courses" replace />;
+  }
+  return <Navigate to="/auth/login" replace />;
+}
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomeRedirect />} />
+
+      {/* Auth routes */}
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+      {/* Public course routes */}
+      <Route path="/courses" element={<CourseCatalogPage />} />
+      <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+
+      {/* Protected student routes */}
+      <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+        <Route path="/dashboard" element={<StudentDashboardPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/my-learning" element={<MyLearningPage />} />
+        <Route path="/learn/:courseId" element={<LearningPlayerPage />} />
+      </Route>
+
+      {/* Protected instructor routes */}
+      <Route element={<ProtectedRoute allowedRoles={["instructor"]} />}>
+        <Route path="/instructor/dashboard" element={<InstructorDashboardPage />} />
+        <Route path="/instructor/courses" element={<CourseManagePage />} />
+        <Route path="/instructor/courses/create" element={<CourseCreatePage />} />
+        <Route path="/instructor/courses/:courseId/edit" element={<CourseEditPage />} />
+        <Route path="/instructor/analytics" element={<InstructorAnalyticsPage />} />
+      </Route>
+
+      {/* Messages — any authenticated role */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/messages" element={<MessagesPage />} />
+      </Route>
+
+      {/* Protected admin routes */}
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/courses" element={<AdminCourseManagePage />} />
+        <Route path="/admin/users" element={<AdminUserManagePage />} />
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}

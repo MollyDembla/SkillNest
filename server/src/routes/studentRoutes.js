@@ -1,9 +1,13 @@
 const express = require('express');
+const { getDashboard } = require('../controllers/studentController');
+const { protect } = require('../middlewares/authMiddleware');
+const { restrictTo } = require('../middlewares/roleMiddleware');
+
 const router = express.Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-  res.json({ message: 'Stub route active' });
-});
+router.use(protect);
+router.use(restrictTo('student'));
+
+router.get('/dashboard', getDashboard);
 
 module.exports = router;

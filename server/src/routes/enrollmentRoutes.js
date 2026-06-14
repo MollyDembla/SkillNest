@@ -1,9 +1,12 @@
 const express = require('express');
+const { getMyEnrollments, checkEnrollment } = require('../controllers/enrollmentController');
+const { protect } = require('../middlewares/authMiddleware');
+
 const router = express.Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-  res.json({ message: 'Stub route active' });
-});
+router.use(protect);
+
+router.get('/my', getMyEnrollments);
+router.get('/check/:courseId', checkEnrollment);
 
 module.exports = router;

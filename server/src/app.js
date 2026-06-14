@@ -26,6 +26,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const lessonRoutes = require('./routes/lessonRoutes');
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/lessons', lessonRoutes);
 
 // 9. Catch-all for undefined routes
 app.use((req, res, next) => {
