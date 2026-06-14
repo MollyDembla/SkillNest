@@ -26,7 +26,10 @@ const startServer = async () => {
   // 4. Register socket events
   initSockets(io);
 
-  // 5. Start listening
+  // 5. Make io accessible in request handlers via req.app.get('io')
+  app.set('io', io);
+
+  // 6. Start listening
   const PORT = config.port || 5000;
   const runningServer = server.listen(PORT, () => {
     console.log(`Server running in ${config.nodeEnv} mode on port ${PORT}`);

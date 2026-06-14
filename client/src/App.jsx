@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ChatProvider } from "./context/ChatContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import Navbar from "./components/layout/Navbar";
 import AppRoutes from "./routes/AppRoutes";
 import "./App.css";
@@ -33,6 +34,7 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <ChatProvider>
+            <NotificationProvider>
             <AppChrome />
             <Toaster
               position="top-right"
@@ -44,6 +46,7 @@ function App() {
                 },
               }}
             />
+            </NotificationProvider>
             </ChatProvider>
           </WishlistProvider>
         </CartProvider>

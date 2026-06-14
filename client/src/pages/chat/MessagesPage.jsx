@@ -97,6 +97,11 @@ function RoomItem({ room, selected, currentUserId, isOnline, onClick }) {
             {lastMsg ? timeAgo(lastMsg.createdAt) : ""}
           </span>
         </div>
+        {room.course && (
+          <div style={{ fontSize: 11, color: purple, fontWeight: 600, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            📚 {room.course.title}
+          </div>
+        )}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4, marginTop: 2 }}>
           <span style={{
             fontSize: 12,
@@ -346,8 +351,12 @@ export default function MessagesPage() {
 
   const filteredRooms = rooms.filter((room) => {
     if (!search) return true;
+    const q = search.toLowerCase();
     const other = room.participants.find((p) => p._id !== user._id);
-    return other?.name?.toLowerCase().includes(search.toLowerCase());
+    return (
+      other?.name?.toLowerCase().includes(q) ||
+      room.course?.title?.toLowerCase().includes(q)
+    );
   });
 
   const selectedRoom = rooms.find((r) => r._id === selectedRoomId);
@@ -425,7 +434,7 @@ export default function MessagesPage() {
             {/* Thread header */}
             <div style={{ padding: "12px 20px", borderBottom: "1px solid #f3f0fa", background: "#fff", display: "flex", alignItems: "center", gap: 12 }}>
               <Avatar user={otherUser} size={40} showOnline online={isOtherOnline} />
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 15, color: "#1a1a2e" }}>{otherUser?.name || "—"}</div>
                 <div style={{ fontSize: 12, color: isOtherOnline ? "#16a34a" : "#9ca3af", fontWeight: 600 }}>
                   {isOtherOnline ? "Online" : "Offline"}
@@ -435,6 +444,11 @@ export default function MessagesPage() {
                     </span>
                   )}
                 </div>
+                {selectedRoom?.course && (
+                  <div style={{ fontSize: 11, color: purple, fontWeight: 600, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    📚 {selectedRoom.course.title}
+                  </div>
+                )}
               </div>
             </div>
 

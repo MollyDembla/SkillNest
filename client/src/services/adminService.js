@@ -24,3 +24,18 @@ export const deleteAdminUser = async (userId) => {
   const res = await api.delete(`/admin/users/${userId}`);
   return res.data;
 };
+
+export const approveCourse = async (courseId) => {
+  const res = await api.patch(`/admin/courses/${courseId}/approve`);
+  return res.data;
+};
+
+export const rejectCourse = async (courseId, reason) => {
+  const res = await api.patch(`/admin/courses/${courseId}/reject`, { reason });
+  return res.data;
+};
+
+export const getPlatformAnalytics = async (days = 30) => {
+  const res = await api.get("/admin/analytics", { params: { days } });
+  return res.data;
+};

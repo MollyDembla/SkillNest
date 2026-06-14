@@ -280,7 +280,7 @@ export default function CourseDetailPage() {
     if (!course?.instructor?._id) return;
     setMsgLoading(true);
     try {
-      const res = await getOrCreateRoom(course.instructor._id);
+      const res = await getOrCreateRoom(course.instructor._id, courseId);
       navigate(`/messages?room=${res.data.room._id}`);
     } catch {
       toast.error("Could not open chat. Please try again.");

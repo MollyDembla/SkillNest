@@ -5,6 +5,7 @@ const Payment = require('../models/Payment');
 const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
 const asyncHandler = require('../utils/asyncHandler');
+const { createNotification } = require('../services/notificationService');
 
 const getDashboard = asyncHandler(async (req, res) => {
   const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -236,4 +237,88 @@ const deleteAdminUser = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, null, 'User deleted successfully.'));
 });
 
-module.exports = { getDashboard, getAdminCourses, getAdminUsers, updateUserRole, deleteAdminUser };
+const approveCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.courseId).populate('instructor', '_id name');
+  if (!course) return next(new ApiError(404, 'Course not found.'));
+  if (course.status === 'published') return next(new ApiError(400, 'Course is already published.'));
+
+  course.status = 'published';
+  course.rejectionReason = '';
+  await course.save();
+
+  const io = req.app.get('io');
+  await createNotification(
+    io,
+    course.instructor._id,
+    'course_status',
+    `Your course "${course.title}" has been approved and is now live!`,
+    `/instructor/courses`
+  );
+
+  res.status(200).json(new ApiResponse(200, { course }, 'Course approved and published.'));
+});
+
+const rejectCourse = asyncHandler(async (req, res, next) => {
+  const { reason } = req.body;
+  if (!reason || !reason.trim()) return next(new ApiError(400, 'A rejection reason is required.'));
+
+  const course = await Course.findById(req.params.courseId).populate('instructor', '_id name');
+  if (!course) return next(new ApiError(404, 'Course not found.'));
+
+  course.status = 'rejected';
+  course.rejectionReason = reason.trim();
+  await course.save();
+
+  const io = req.app.get('io');
+  await createNotification(
+    io,
+    course.instructor._id,
+    'course_status',
+    `Your course "${course.title}" was rejected. Reason: ${reason.trim()}`,
+    `/instructor/courses`
+  );
+
+  res.status(200).json(new ApiResponse(200, { course }, 'Course rejected.'));
+});
+
+const getPlatformAnalytics = asyncHandler(async (req, res) => {
+  const days = Math.min(parseInt(req.query.days, 10) || 30, 90);
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+  const [
+    totalUsers, totalCourses, totalEnrollments, revenueAgg,
+    revenueByDayAgg, enrollmentsByDayAgg, topCourses,
+  ] = await Promise.all([
+    User.countDocuments(),
+    Course.countDocuments({ status: 'published' }),
+    Enrollment.countDocuments({ status: { $ne: 'refunded' } }),
+    Payment.aggregate([{ $match: { status: 'succeeded' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+    Payment.aggregate([
+      { $match: { status: 'succeeded', createdAt: { $gte: since } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, amount: { $sum: '$amount' } } },
+      { $sort: { _id: 1 } },
+    ]),
+    Enrollment.aggregate([
+      { $match: { createdAt: { $gte: since } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]),
+    Course.find({ status: 'published' })
+      .populate('instructor', 'name')
+      .sort({ reviewsCount: -1, averageRating: -1 })
+      .limit(10)
+      .select('title thumbnail averageRating reviewsCount price instructor'),
+  ]);
+
+  res.status(200).json(new ApiResponse(200, {
+    totalUsers,
+    totalCourses,
+    totalEnrollments,
+    totalRevenue: parseFloat((revenueAgg[0]?.total || 0).toFixed(2)),
+    revenueByDay: revenueByDayAgg.map((r) => ({ date: r._id, amount: parseFloat(r.amount.toFixed(2)) })),
+    enrollmentsByDay: enrollmentsByDayAgg.map((r) => ({ date: r._id, count: r.count })),
+    topCourses,
+  }, 'Platform analytics retrieved.'));
+});
+
+module.exports = { getDashboard, getAdminCourses, getAdminUsers, updateUserRole, deleteAdminUser, approveCourse, rejectCourse, getPlatformAnalytics };

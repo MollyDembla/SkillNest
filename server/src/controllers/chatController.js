@@ -9,10 +9,8 @@ const asyncHandler = require('../utils/asyncHandler');
 const getRooms = asyncHandler(async (req, res) => {
   const rooms = await ChatRoom.find({ participants: req.user._id })
     .populate('participants', 'name avatar role')
-    .populate({
-      path: 'lastMessage',
-      populate: { path: 'sender', select: 'name' },
-    })
+    .populate({ path: 'lastMessage', populate: { path: 'sender', select: 'name' } })
+    .populate('course', 'title thumbnail')
     .sort({ updatedAt: -1 });
 
   // Attach per-room unread count
@@ -30,9 +28,9 @@ const getRooms = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { rooms: enriched }, 'Rooms retrieved.'));
 });
 
-// POST /chat/rooms  body: { participantId }
+// POST /chat/rooms  body: { participantId, courseId }
 const getOrCreateRoom = asyncHandler(async (req, res, next) => {
-  const { participantId } = req.body;
+  const { participantId, courseId } = req.body;
   if (!participantId) return next(new ApiError(400, 'participantId is required.'));
   if (participantId === req.user._id.toString())
     return next(new ApiError(400, 'Cannot chat with yourself.'));
@@ -40,13 +38,17 @@ const getOrCreateRoom = asyncHandler(async (req, res, next) => {
   const other = await User.findById(participantId).select('name avatar role');
   if (!other) return next(new ApiError(404, 'User not found.'));
 
-  // Find or return existing one-to-one room
-  const existing = await ChatRoom.findOne({
+  // Each course gets its own room — scope by course when provided
+  const query = {
     type: 'one-to-one',
     participants: { $all: [req.user._id, participantId], $size: 2 },
-  })
+    course: courseId || null,
+  };
+
+  const existing = await ChatRoom.findOne(query)
     .populate('participants', 'name avatar role')
-    .populate({ path: 'lastMessage', populate: { path: 'sender', select: 'name' } });
+    .populate({ path: 'lastMessage', populate: { path: 'sender', select: 'name' } })
+    .populate('course', 'title thumbnail');
 
   if (existing) {
     return res.status(200).json(new ApiResponse(200, { room: existing }, 'Room found.'));
@@ -55,8 +57,10 @@ const getOrCreateRoom = asyncHandler(async (req, res, next) => {
   const room = await ChatRoom.create({
     participants: [req.user._id, participantId],
     type: 'one-to-one',
+    course: courseId || null,
   });
   await room.populate('participants', 'name avatar role');
+  await room.populate('course', 'title thumbnail');
 
   res.status(201).json(new ApiResponse(201, { room }, 'Room created.'));
 });

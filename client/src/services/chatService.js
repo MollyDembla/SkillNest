@@ -5,8 +5,8 @@ export const getRooms = async () => {
   return res.data;
 };
 
-export const getOrCreateRoom = async (participantId) => {
-  const res = await api.post('/chat/rooms', { participantId });
+export const getOrCreateRoom = async (participantId, courseId) => {
+  const res = await api.post('/chat/rooms', { participantId, courseId });
   return res.data;
 };
 

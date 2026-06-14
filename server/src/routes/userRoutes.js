@@ -1,9 +1,12 @@
 const express = require('express');
+const { getProfile, updateProfile, changePassword, getPublicProfile } = require('../controllers/userController');
+const { protect } = require('../middlewares/authMiddleware');
+
 const router = express.Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-  res.json({ message: 'Stub route active' });
-});
+router.get('/profile', protect, getProfile);
+router.put('/profile', protect, updateProfile);
+router.put('/password', protect, changePassword);
+router.get('/:userId/public', getPublicProfile);
 
 module.exports = router;

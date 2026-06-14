@@ -1,9 +1,10 @@
 const express = require('express');
+const { getRecommendations, checkAiHealth } = require('../controllers/aiController');
+const { protect } = require('../middlewares/authMiddleware');
+
 const router = express.Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-  res.json({ message: 'Stub route active' });
-});
+router.get('/health', protect, checkAiHealth);
+router.get('/recommendations', protect, getRecommendations);
 
 module.exports = router;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboard } from "../../services/studentService";
+import { getRecommendations } from "../../services/aiService";
 
 const purple = "#5f4999";
 const purpleDark = "#3c3168";
@@ -243,17 +244,90 @@ function CourseMinCard({ enrollment }) {
   );
 }
 
+function RecommendedCourseCard({ course }) {
+  return (
+    <Link to={`/courses/${course.slug || course._id}`} style={{ textDecoration: "none" }}>
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 14,
+          boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+          overflow: "hidden",
+          transition: "transform 0.15s",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+      >
+        <div style={{ height: 110, background: "#e9e4f7", overflow: "hidden", flexShrink: 0 }}>
+          {course.thumbnail ? (
+            <img
+              src={course.thumbnail}
+              alt={course.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 36,
+              }}
+            >
+              🤖
+            </div>
+          )}
+        </div>
+        <div style={{ padding: "12px 14px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              fontWeight: 700,
+              color: "#1a1a2e",
+              fontSize: 13,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              marginBottom: 4,
+            }}
+          >
+            {course.title}
+          </div>
+          <div style={{ fontSize: 11, color: "#6b7280" }}>{course.instructor?.name}</div>
+          <div style={{ marginTop: "auto", paddingTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12, color: purple, fontWeight: 700 }}>
+              {course.averageRating ? `⭐ ${course.averageRating.toFixed(1)}` : "New"}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#1a1a2e" }}>
+              {course.price === 0 ? "Free" : `$${course.price}`}
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function StudentDashboardPage() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     getDashboard()
       .then((res) => setData(res.data))
       .catch((err) => setError(err.response?.data?.message || "Failed to load dashboard"))
       .finally(() => setLoading(false));
+
+    getRecommendations(8)
+      .then((res) => setRecommendations(res.data?.recommendations || []))
+      .catch(() => {});
   }, []);
 
   const firstName = user?.name?.split(" ")[0] || "there";
@@ -464,6 +538,41 @@ export default function StudentDashboardPage() {
             >
               {recentEnrollments.map((e) => (
                 <CourseMinCard key={e._id} enrollment={e} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* AI Recommendations */}
+        {recommendations.length > 0 && (
+          <section style={{ marginBottom: 36 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1a1a2e" }}>
+                🤖 Recommended for You
+              </h2>
+              <Link
+                to="/courses"
+                style={{ fontSize: 13, color: purple, fontWeight: 700, textDecoration: "none" }}
+              >
+                Browse all →
+              </Link>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {recommendations.map((course) => (
+                <RecommendedCourseCard key={course._id} course={course} />
               ))}
             </div>
           </section>
