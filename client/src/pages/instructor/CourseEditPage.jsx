@@ -3,7 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getInstructorCourse } from "../../services/instructorService";
 import { updateCourse } from "../../services/courseService";
-import { addLesson, updateLesson, deleteLesson } from "../../services/lessonService";
+import {
+  addLesson,
+  updateLesson,
+  deleteLesson,
+} from "../../services/lessonService";
 
 const purple = "#5f4999";
 const purpleDark = "#3c3168";
@@ -11,43 +15,74 @@ const purpleLight = "#ede9f8";
 const green = "#16a34a";
 
 const CATEGORIES = [
-  "Development", "Business", "Design", "Marketing",
-  "Photography", "Music", "Health & Fitness", "Finance", "Other",
+  "Development",
+  "Business",
+  "Design",
+  "Marketing",
+  "Photography",
+  "Music",
+  "Health & Fitness",
+  "Finance",
+  "Other",
 ];
 const LEVELS = [
-  { value: "beginner",     label: "Beginner" },
+  { value: "beginner", label: "Beginner" },
   { value: "intermediate", label: "Intermediate" },
-  { value: "advanced",     label: "Advanced" },
-  { value: "all",          label: "All Levels" },
+  { value: "advanced", label: "Advanced" },
+  { value: "all", label: "All Levels" },
 ];
 const STATUS_CONFIG = {
-  draft:     { bg: "#f3f4f6", color: "#6b7280",  label: "Draft",          icon: "📝" },
-  pending:   { bg: "#fef3c7", color: "#d97706",  label: "Pending Review", icon: "⏳" },
-  published: { bg: "#dcfce7", color: "#16a34a",  label: "Published",      icon: "✅" },
-  rejected:  { bg: "#fee2e2", color: "#dc2626",  label: "Rejected",       icon: "❌" },
+  draft: { bg: "#f3f4f6", color: "#6b7280", label: "Draft" },
+  pending: { bg: "#fef3c7", color: "#d97706", label: "Pending Review" },
+  published: { bg: "#dcfce7", color: "#16a34a", label: "Published" },
+  rejected: { bg: "#fee2e2", color: "#dc2626", label: "Rejected" },
 };
 
 const inputStyle = {
-  width: "100%", padding: "10px 14px",
-  border: "1.5px solid #e9e4f7", borderRadius: 10,
-  fontSize: 14, color: "#1a1a2e", background: "#faf8ff",
-  outline: "none", boxSizing: "border-box", fontFamily: "inherit",
+  width: "100%",
+  padding: "10px 14px",
+  border: "1.5px solid #e9e4f7",
+  borderRadius: 10,
+  fontSize: 14,
+  color: "#1a1a2e",
+  background: "#faf8ff",
+  outline: "none",
+  boxSizing: "border-box",
+  fontFamily: "inherit",
 };
-const labelStyle = { display: "block", marginBottom: 6, fontSize: 13, fontWeight: 700, color: "#53467f" };
+const labelStyle = {
+  display: "block",
+  marginBottom: 6,
+  fontSize: 13,
+  fontWeight: 700,
+  color: "#53467f",
+};
 const sectionCard = {
-  background: "#fff", borderRadius: 16,
-  padding: "24px 28px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+  background: "#fff",
+  borderRadius: 16,
+  padding: "24px 28px",
+  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
   marginBottom: 20,
 };
 const sectionTitle = {
-  margin: "0 0 20px", fontSize: 16, fontWeight: 800, color: "#1a1a2e",
-  paddingBottom: 12, borderBottom: "1px solid #f3f0fa",
-  display: "flex", alignItems: "center", gap: 8,
+  margin: "0 0 20px",
+  fontSize: 16,
+  fontWeight: 800,
+  color: "#1a1a2e",
+  paddingBottom: 12,
+  borderBottom: "1px solid #f3f0fa",
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
 };
 
 // ─── helpers ──────────────────────────────────────────────────
-function secToMin(s) { return s ? parseFloat((s / 60).toFixed(1)) : ""; }
-function minToSec(m) { return Math.round(parseFloat(m || 0) * 60); }
+function secToMin(s) {
+  return s ? parseFloat((s / 60).toFixed(1)) : "";
+}
+function minToSec(m) {
+  return Math.round(parseFloat(m || 0) * 60);
+}
 function displayDuration(sec) {
   const total = sec || 0;
   const h = Math.floor(total / 3600);
@@ -61,7 +96,19 @@ function totalDuration(lessons) {
 }
 
 // ─── LessonRow ─────────────────────────────────────────────────
-function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete, onMoveUp, onMoveDown, saving, deleting }) {
+function LessonRow({
+  lesson,
+  index,
+  total,
+  expanded,
+  onExpand,
+  onSave,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  saving,
+  deleting,
+}) {
   const [form, setForm] = useState({
     title: lesson.title || "",
     description: lesson.description || "",
@@ -82,7 +129,10 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
   }, [lesson]);
 
   const handleSave = () => {
-    if (!form.title.trim()) { toast.error("Lesson title is required."); return; }
+    if (!form.title.trim()) {
+      toast.error("Lesson title is required.");
+      return;
+    }
     onSave(lesson._id, {
       title: form.title.trim(),
       description: form.description,
@@ -97,25 +147,43 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
       {/* Header row */}
       <div
         style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "13px 16px", cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "13px 16px",
+          cursor: "pointer",
           background: expanded ? "#faf8ff" : "transparent",
           transition: "background 0.1s",
         }}
         onClick={() => onExpand(expanded ? null : lesson._id)}
       >
         {/* Reorder buttons */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 1, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            flexShrink: 0,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
             disabled={index === 0}
             onClick={() => onMoveUp(index)}
             title="Move up"
             style={{
-              width: 20, height: 18, border: "none", borderRadius: 4,
+              width: 20,
+              height: 18,
+              border: "none",
+              borderRadius: 4,
               background: index === 0 ? "#f3f0fa" : purpleLight,
               color: index === 0 ? "#d1c4e9" : purple,
               cursor: index === 0 ? "default" : "pointer",
-              fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+              fontSize: 10,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
             }}
           >
             ▲
@@ -125,11 +193,18 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
             onClick={() => onMoveDown(index)}
             title="Move down"
             style={{
-              width: 20, height: 18, border: "none", borderRadius: 4,
+              width: 20,
+              height: 18,
+              border: "none",
+              borderRadius: 4,
               background: index === total - 1 ? "#f3f0fa" : purpleLight,
               color: index === total - 1 ? "#d1c4e9" : purple,
               cursor: index === total - 1 ? "default" : "pointer",
-              fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+              fontSize: 10,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
             }}
           >
             ▼
@@ -139,11 +214,17 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
         {/* Order badge */}
         <div
           style={{
-            width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            flexShrink: 0,
             background: expanded ? purple : "#e9e4f7",
             color: expanded ? "#fff" : purple,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 12, fontWeight: 800,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            fontWeight: 800,
           }}
         >
           {index + 1}
@@ -153,28 +234,54 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontWeight: 700, color: "#1a1a2e", fontSize: 14,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              fontWeight: 700,
+              color: "#1a1a2e",
+              fontSize: 14,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
-            {lesson.title || <span style={{ color: "#9ca3af", fontWeight: 500 }}>Untitled lesson</span>}
+            {lesson.title || (
+              <span style={{ color: "#9ca3af", fontWeight: 500 }}>
+                Untitled lesson
+              </span>
+            )}
           </div>
         </div>
 
         {/* Meta */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
           {lesson.videoDuration > 0 && (
-            <span style={{ fontSize: 12, color: "#6b7280" }}>{displayDuration(lesson.videoDuration)}</span>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>
+              {displayDuration(lesson.videoDuration)}
+            </span>
           )}
           {lesson.isPreview && (
-            <span style={{ fontSize: 10, fontWeight: 700, background: purpleLight, color: purple, padding: "2px 8px", borderRadius: 99 }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                background: purpleLight,
+                color: purple,
+                padding: "2px 8px",
+                borderRadius: 99,
+              }}
+            >
               Preview
             </span>
           )}
           {lesson.videoUrl ? (
-            <span style={{ fontSize: 12, color: green }}>🎬</span>
+            <span style={{ fontSize: 12, color: green }}>Video</span>
           ) : (
-            <span style={{ fontSize: 12, color: "#d1d5db" }}>🎬</span>
+            <span style={{ fontSize: 12, color: "#d1d5db" }}>No video</span>
           )}
           <span style={{ fontSize: 16, color: "#9ca3af", userSelect: "none" }}>
             {expanded ? "▲" : "▼"}
@@ -184,15 +291,22 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
 
       {/* Inline editor */}
       {expanded && (
-        <div style={{ padding: "0 20px 20px", background: "#faf8ff", borderTop: "1px solid #f3f0fa" }}>
+        <div
+          style={{
+            padding: "0 20px 20px",
+            background: "#faf8ff",
+            borderTop: "1px solid #f3f0fa",
+          }}
+        >
           <div style={{ paddingTop: 16, display: "grid", gap: 14 }}>
-
             <div>
               <label style={labelStyle}>Lesson Title *</label>
               <input
                 style={inputStyle}
                 value={form.title}
-                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, title: e.target.value }))
+                }
                 placeholder="e.g. Introduction to Variables"
                 onClick={(e) => e.stopPropagation()}
               />
@@ -203,19 +317,29 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
               <textarea
                 style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
                 value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
                 placeholder="What does this lesson cover?"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 14,
+              }}
+            >
               <div>
                 <label style={labelStyle}>Video URL</label>
                 <input
                   style={inputStyle}
                   value={form.videoUrl}
-                  onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, videoUrl: e.target.value }))
+                  }
                   placeholder="YouTube, Vimeo, or direct URL"
                   onClick={(e) => e.stopPropagation()}
                 />
@@ -223,53 +347,125 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
               <div>
                 <label style={labelStyle}>Duration (minutes)</label>
                 <input
-                  type="number" min={0} step={0.5}
+                  type="number"
+                  min={0}
+                  step={0.5}
                   style={inputStyle}
                   value={form.durationMin}
-                  onChange={(e) => setForm((f) => ({ ...f, durationMin: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, durationMin: e.target.value }))
+                  }
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
             </div>
 
             <label
-              style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                cursor: "pointer",
+                userSelect: "none",
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               <input
                 type="checkbox"
                 checked={form.isPreview}
-                onChange={(e) => setForm((f) => ({ ...f, isPreview: e.target.checked }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, isPreview: e.target.checked }))
+                }
                 style={{ width: 16, height: 16, accentColor: purple }}
               />
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Free preview lesson</div>
-                <div style={{ fontSize: 11, color: "#9ca3af" }}>Students can watch this before enrolling</div>
+                <div
+                  style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}
+                >
+                  Free preview lesson
+                </div>
+                <div style={{ fontSize: 11, color: "#9ca3af" }}>
+                  Students can watch this before enrolling
+                </div>
               </div>
             </label>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+              }}
+            >
               <div>
                 {!confirmDelete ? (
                   <button
-                    onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-                    style={{ background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmDelete(true);
+                    }}
+                    style={{
+                      background: "#fee2e2",
+                      color: "#dc2626",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 16px",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 ) : (
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ fontSize: 13, color: "#dc2626", fontWeight: 700 }}>Delete this lesson?</span>
+                  <div
+                    style={{ display: "flex", gap: 8, alignItems: "center" }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#dc2626",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Delete this lesson?
+                    </span>
                     <button
-                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(false); }}
-                      style={{ background: "#f3f4f6", color: "#374151", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDelete(false);
+                      }}
+                      style={{
+                        background: "#f3f4f6",
+                        color: "#374151",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "6px 12px",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
                     >
                       No
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); onDelete(lesson._id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(lesson._id);
+                      }}
                       disabled={deleting}
-                      style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                      style={{
+                        background: "#dc2626",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "6px 14px",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
                     >
                       {deleting ? "Deleting…" : "Yes, Delete"}
                     </button>
@@ -278,15 +474,39 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button
-                  onClick={(e) => { e.stopPropagation(); onExpand(null); }}
-                  style={{ background: "#f3f4f6", color: "#374151", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onExpand(null);
+                  }}
+                  style={{
+                    background: "#f3f4f6",
+                    color: "#374151",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 18px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleSave(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSave();
+                  }}
                   disabled={saving}
-                  style={{ background: saving ? "#d1c4f7" : purple, color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}
+                  style={{
+                    background: saving ? "#d1c4f7" : purple,
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 20px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: saving ? "not-allowed" : "pointer",
+                  }}
                 >
                   {saving ? "Saving…" : "Save Lesson"}
                 </button>
@@ -300,17 +520,28 @@ function LessonRow({ lesson, index, total, expanded, onExpand, onSave, onDelete,
 }
 
 // ─── AddLessonForm ────────────────────────────────────────────
-const EMPTY_LESSON = { title: "", description: "", videoUrl: "", durationMin: "", isPreview: false };
+const EMPTY_LESSON = {
+  title: "",
+  description: "",
+  videoUrl: "",
+  durationMin: "",
+  isPreview: false,
+};
 
 function AddLessonForm({ courseId, onSaved, onCancel }) {
   const [form, setForm] = useState(EMPTY_LESSON);
   const [saving, setSaving] = useState(false);
   const titleRef = useRef(null);
 
-  useEffect(() => { titleRef.current?.focus(); }, []);
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   const handleSave = async () => {
-    if (!form.title.trim()) { toast.error("Lesson title is required."); return; }
+    if (!form.title.trim()) {
+      toast.error("Lesson title is required.");
+      return;
+    }
     setSaving(true);
     try {
       const res = await addLesson(courseId, {
@@ -331,12 +562,36 @@ function AddLessonForm({ courseId, onSaved, onCancel }) {
   };
 
   return (
-    <div style={{ padding: 20, background: "#faf8ff", borderTop: "2px dashed #e9e4f7" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#1a1a2e" }}>New Lesson</h4>
+    <div
+      style={{
+        padding: 20,
+        background: "#faf8ff",
+        borderTop: "2px dashed #e9e4f7",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+        }}
+      >
+        <h4
+          style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#1a1a2e" }}
+        >
+          New Lesson
+        </h4>
         <button
           onClick={onCancel}
-          style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#9ca3af", lineHeight: 1 }}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: 20,
+            cursor: "pointer",
+            color: "#9ca3af",
+            lineHeight: 1,
+          }}
         >
           ×
         </button>
@@ -350,7 +605,12 @@ function AddLessonForm({ courseId, onSaved, onCancel }) {
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             placeholder="e.g. Introduction to the Course"
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSave(); } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSave();
+              }
+            }}
           />
         </div>
         <div>
@@ -358,51 +618,91 @@ function AddLessonForm({ courseId, onSaved, onCancel }) {
           <textarea
             style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
             value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, description: e.target.value }))
+            }
             placeholder="Brief description of this lesson"
           />
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
+        >
           <div>
             <label style={labelStyle}>Video URL</label>
             <input
               style={inputStyle}
               value={form.videoUrl}
-              onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, videoUrl: e.target.value }))
+              }
               placeholder="YouTube or Vimeo URL"
             />
           </div>
           <div>
             <label style={labelStyle}>Duration (minutes)</label>
             <input
-              type="number" min={0} step={0.5}
+              type="number"
+              min={0}
+              step={0.5}
               style={inputStyle}
               value={form.durationMin}
-              onChange={(e) => setForm((f) => ({ ...f, durationMin: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, durationMin: e.target.value }))
+              }
               placeholder="e.g. 12.5"
             />
           </div>
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none" }}>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+        >
           <input
             type="checkbox"
             checked={form.isPreview}
-            onChange={(e) => setForm((f) => ({ ...f, isPreview: e.target.checked }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, isPreview: e.target.checked }))
+            }
             style={{ width: 16, height: 16, accentColor: purple }}
           />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Make this a free preview lesson</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>
+            Make this a free preview lesson
+          </span>
         </label>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button
             onClick={onCancel}
-            style={{ background: "#f3f4f6", color: "#374151", border: "none", borderRadius: 8, padding: "9px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+            style={{
+              background: "#f3f4f6",
+              color: "#374151",
+              border: "none",
+              borderRadius: 8,
+              padding: "9px 20px",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            style={{ background: saving ? "#d1c4f7" : purple, color: "#fff", border: "none", borderRadius: 8, padding: "9px 22px", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}
+            style={{
+              background: saving ? "#d1c4f7" : purple,
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              padding: "9px 22px",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: saving ? "not-allowed" : "pointer",
+            }}
           >
             {saving ? "Adding…" : "Add Lesson"}
           </button>
@@ -431,8 +731,15 @@ export default function CourseEditPage() {
   const [thumbError, setThumbError] = useState(false);
 
   const [form, setForm] = useState({
-    title: "", subtitle: "", description: "", category: "",
-    level: "beginner", price: 0, estimatedDuration: "", thumbnail: "", previewVideoUrl: "",
+    title: "",
+    subtitle: "",
+    description: "",
+    category: "",
+    level: "beginner",
+    price: 0,
+    estimatedDuration: "",
+    thumbnail: "",
+    previewVideoUrl: "",
   });
   const originalForm = useRef(null);
 
@@ -441,15 +748,15 @@ export default function CourseEditPage() {
       .then((res) => {
         const { course, lessons: ls } = res.data;
         const loaded = {
-          title:            course.title || "",
-          subtitle:         course.subtitle || "",
-          description:      course.description || "",
-          category:         course.category || "",
-          level:            course.level || "beginner",
-          price:            course.price ?? 0,
+          title: course.title || "",
+          subtitle: course.subtitle || "",
+          description: course.description || "",
+          category: course.category || "",
+          level: course.level || "beginner",
+          price: course.price ?? 0,
           estimatedDuration: course.estimatedDuration || "",
-          thumbnail:        course.thumbnail || "",
-          previewVideoUrl:  course.previewVideoUrl || "",
+          thumbnail: course.thumbnail || "",
+          previewVideoUrl: course.previewVideoUrl || "",
         };
         setForm(loaded);
         originalForm.current = loaded;
@@ -468,15 +775,28 @@ export default function CourseEditPage() {
     setForm((f) => {
       const next = { ...f, [field]: value };
       const orig = originalForm.current;
-      setDirty(orig ? Object.keys(next).some((k) => String(next[k]) !== String(orig[k])) : true);
+      setDirty(
+        orig
+          ? Object.keys(next).some((k) => String(next[k]) !== String(orig[k]))
+          : true,
+      );
       return next;
     });
   };
 
   const handleSave = async () => {
-    if (!form.title.trim()) { toast.error("Course title is required."); return; }
-    if (!form.description.trim()) { toast.error("Description is required."); return; }
-    if (!form.category) { toast.error("Please select a category."); return; }
+    if (!form.title.trim()) {
+      toast.error("Course title is required.");
+      return;
+    }
+    if (!form.description.trim()) {
+      toast.error("Description is required.");
+      return;
+    }
+    if (!form.category) {
+      toast.error("Please select a category.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -493,7 +813,9 @@ export default function CourseEditPage() {
 
   const handleSubmitForReview = async () => {
     if (!form.title.trim() || !form.description.trim() || !form.category) {
-      toast.error("Please complete title, description, and category before submitting.");
+      toast.error(
+        "Please complete title, description, and category before submitting.",
+      );
       return;
     }
     if (lessons.length === 0) {
@@ -547,7 +869,9 @@ export default function CourseEditPage() {
     setLessonSaving(lessonId);
     try {
       const res = await updateLesson(lessonId, data);
-      setLessons((prev) => prev.map((l) => (l._id === lessonId ? res.data.lesson : l)));
+      setLessons((prev) =>
+        prev.map((l) => (l._id === lessonId ? res.data.lesson : l)),
+      );
       toast.success("Lesson saved.");
       setExpandedLesson(null);
     } catch (err) {
@@ -582,10 +906,27 @@ export default function CourseEditPage() {
   // ── Loading ────────────────────────────────────────────────
   if (pageLoading) {
     return (
-      <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          minHeight: "80vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         <div style={{ textAlign: "center" }}>
-          <div style={{ width: 44, height: 44, border: `4px solid ${purpleLight}`, borderTop: `4px solid ${purple}`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }} />
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              border: `4px solid ${purpleLight}`,
+              borderTop: `4px solid ${purple}`,
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+              margin: "0 auto 12px",
+            }}
+          />
           <p style={{ color: "#9b8ec4", margin: 0 }}>Loading course editor…</p>
         </div>
       </div>
@@ -593,34 +934,73 @@ export default function CourseEditPage() {
   }
 
   return (
-    <div style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}>
+    <div
+      style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}
+    >
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* ── Sticky header ── */}
       <div
         style={{
-          position: "sticky", top: 0, zIndex: 10,
-          background: "#fff", borderBottom: "1px solid #f3f0fa",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          background: "#fff",
+          borderBottom: "1px solid #f3f0fa",
           padding: "12px 24px",
-          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
           boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-          <Link to="/instructor/courses" style={{ fontSize: 13, color: "#6b7280", textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            minWidth: 0,
+          }}
+        >
+          <Link
+            to="/instructor/courses"
+            style={{
+              fontSize: 13,
+              color: "#6b7280",
+              textDecoration: "none",
+              fontWeight: 600,
+              flexShrink: 0,
+            }}
+          >
             ← My Courses
           </Link>
           <span style={{ color: "#d1d5db", flexShrink: 0 }}>|</span>
           <span
             style={{
-              background: badge.bg, color: badge.color,
-              fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99, flexShrink: 0,
+              background: badge.bg,
+              color: badge.color,
+              fontSize: 11,
+              fontWeight: 700,
+              padding: "3px 10px",
+              borderRadius: 99,
+              flexShrink: 0,
             }}
           >
             {badge.icon} {badge.label}
           </span>
           {dirty && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#d97706", background: "#fef3c7", padding: "3px 10px", borderRadius: 99, flexShrink: 0 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#d97706",
+                background: "#fef3c7",
+                padding: "3px 10px",
+                borderRadius: 99,
+                flexShrink: 0,
+              }}
+            >
               Unsaved changes
             </span>
           )}
@@ -632,30 +1012,48 @@ export default function CourseEditPage() {
               onClick={handleSubmitForReview}
               disabled={saving}
               style={{
-                padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700,
-                border: `1.5px solid ${purple}`, background: "transparent", color: purple,
+                padding: "8px 18px",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 700,
+                border: `1.5px solid ${purple}`,
+                background: "transparent",
+                color: purple,
                 cursor: saving ? "not-allowed" : "pointer",
               }}
             >
-              📤 Submit for Review
+              Submit for Review
             </button>
           )}
           {courseStatus === "published" && (
             <Link
               to={`/courses/${courseId}`}
               target="_blank"
-              style={{ padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, background: "#dcfce7", color: green, textDecoration: "none" }}
+              style={{
+                padding: "8px 18px",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 700,
+                background: "#dcfce7",
+                color: green,
+                textDecoration: "none",
+              }}
             >
-              👁️ View Course
+              View Course
             </Link>
           )}
           <button
             onClick={handleSave}
             disabled={saving}
             style={{
-              padding: "8px 24px", borderRadius: 10, fontSize: 13, fontWeight: 800,
-              background: saving ? "#d1c4f7" : purple, color: "#fff",
-              border: "none", cursor: saving ? "not-allowed" : "pointer",
+              padding: "8px 24px",
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              background: saving ? "#d1c4f7" : purple,
+              color: "#fff",
+              border: "none",
+              cursor: saving ? "not-allowed" : "pointer",
             }}
           >
             {saving ? "Saving…" : dirty ? "Save Changes ●" : "Save Changes"}
@@ -664,24 +1062,42 @@ export default function CourseEditPage() {
       </div>
 
       <div style={{ maxWidth: 820, margin: "28px auto 0", padding: "0 24px" }}>
-
         {/* ── Rejection banner ── */}
         {courseStatus === "rejected" && (
           <div
             style={{
-              background: "#fee2e2", borderRadius: 14, padding: "16px 20px",
-              marginBottom: 20, display: "flex", gap: 12,
+              background: "#fee2e2",
+              borderRadius: 14,
+              padding: "16px 20px",
+              marginBottom: 20,
+              display: "flex",
+              gap: 12,
             }}
           >
-            <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
+            <div style={{ fontSize: 22, flexShrink: 0 }} />
             <div>
-              <div style={{ fontWeight: 800, color: "#dc2626", fontSize: 14, marginBottom: 4 }}>
+              <div
+                style={{
+                  fontWeight: 800,
+                  color: "#dc2626",
+                  fontSize: 14,
+                  marginBottom: 4,
+                }}
+              >
                 Course Rejected by Admin
               </div>
               <div style={{ fontSize: 13, color: "#7f1d1d", lineHeight: 1.6 }}>
-                {rejectionReason || "No reason provided. Please contact support."}
+                {rejectionReason ||
+                  "No reason provided. Please contact support."}
               </div>
-              <div style={{ marginTop: 10, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 12,
+                  color: "#dc2626",
+                  fontWeight: 600,
+                }}
+              >
                 Fix the issues above, then save and resubmit for review.
               </div>
             </div>
@@ -692,15 +1108,23 @@ export default function CourseEditPage() {
         {courseStatus === "pending" && (
           <div
             style={{
-              background: "#fefce8", borderRadius: 14, padding: "14px 20px",
-              marginBottom: 20, display: "flex", gap: 12, alignItems: "center",
+              background: "#fefce8",
+              borderRadius: 14,
+              padding: "14px 20px",
+              marginBottom: 20,
+              display: "flex",
+              gap: 12,
+              alignItems: "center",
             }}
           >
-            <span style={{ fontSize: 20 }}>⏳</span>
+            <span style={{ fontSize: 20 }} />
             <div>
-              <div style={{ fontWeight: 700, color: "#92400e", fontSize: 13 }}>Under Admin Review</div>
+              <div style={{ fontWeight: 700, color: "#92400e", fontSize: 13 }}>
+                Under Admin Review
+              </div>
               <div style={{ fontSize: 12, color: "#a16207", marginTop: 2 }}>
-                Your course is being reviewed. You can still edit it, but resubmission will be required after making changes.
+                Your course is being reviewed. You can still edit it, but
+                resubmission will be required after making changes.
               </div>
             </div>
           </div>
@@ -708,10 +1132,12 @@ export default function CourseEditPage() {
 
         {/* ── Basic Info ── */}
         <div style={sectionCard}>
-          <h2 style={sectionTitle}><span>📝</span> Basic Information</h2>
+          <h2 style={sectionTitle}>Basic Information</h2>
           <div style={{ display: "grid", gap: 16 }}>
             <div>
-              <label style={labelStyle}>Course Title <span style={{ color: "#dc2626" }}>*</span></label>
+              <label style={labelStyle}>
+                Course Title <span style={{ color: "#dc2626" }}>*</span>
+              </label>
               <input
                 style={inputStyle}
                 value={form.title}
@@ -719,7 +1145,16 @@ export default function CourseEditPage() {
                 placeholder="e.g. The Complete JavaScript Bootcamp"
                 maxLength={100}
               />
-              <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4, textAlign: "right" }}>{form.title.length}/100</div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#9ca3af",
+                  marginTop: 4,
+                  textAlign: "right",
+                }}
+              >
+                {form.title.length}/100
+              </div>
             </div>
             <div>
               <label style={labelStyle}>Subtitle</label>
@@ -732,7 +1167,9 @@ export default function CourseEditPage() {
               />
             </div>
             <div>
-              <label style={labelStyle}>Description <span style={{ color: "#dc2626" }}>*</span></label>
+              <label style={labelStyle}>
+                Description <span style={{ color: "#dc2626" }}>*</span>
+              </label>
               <textarea
                 style={{ ...inputStyle, minHeight: 140, resize: "vertical" }}
                 value={form.description}
@@ -745,33 +1182,69 @@ export default function CourseEditPage() {
 
         {/* ── Course Details ── */}
         <div style={sectionCard}>
-          <h2 style={sectionTitle}><span>🎓</span> Course Details</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <h2 style={sectionTitle}>Course Details</h2>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+          >
             <div>
-              <label style={labelStyle}>Category <span style={{ color: "#dc2626" }}>*</span></label>
-              <select style={inputStyle} value={form.category} onChange={(e) => set("category", e.target.value)}>
+              <label style={labelStyle}>
+                Category <span style={{ color: "#dc2626" }}>*</span>
+              </label>
+              <select
+                style={inputStyle}
+                value={form.category}
+                onChange={(e) => set("category", e.target.value)}
+              >
                 <option value="">Select a category</option>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label style={labelStyle}>Level</label>
-              <select style={inputStyle} value={form.level} onChange={(e) => set("level", e.target.value)}>
-                {LEVELS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+              <select
+                style={inputStyle}
+                value={form.level}
+                onChange={(e) => set("level", e.target.value)}
+              >
+                {LEVELS.map((l) => (
+                  <option key={l.value} value={l.value}>
+                    {l.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label style={labelStyle}>Price (USD)</label>
               <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#6b7280", fontWeight: 700, fontSize: 14 }}>$</span>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#6b7280",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  $
+                </span>
                 <input
-                  type="number" min={0} step={0.01}
+                  type="number"
+                  min={0}
+                  step={0.01}
                   style={{ ...inputStyle, paddingLeft: 28 }}
                   value={form.price}
                   onChange={(e) => set("price", e.target.value)}
                 />
               </div>
-              <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>Enter 0 for a free course</div>
+              <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
+                Enter 0 for a free course
+              </div>
             </div>
             <div>
               <label style={labelStyle}>Estimated Duration</label>
@@ -787,20 +1260,36 @@ export default function CourseEditPage() {
 
         {/* ── Media ── */}
         <div style={sectionCard}>
-          <h2 style={sectionTitle}><span>🖼️</span> Media</h2>
+          <h2 style={sectionTitle}>Media</h2>
           <div style={{ display: "grid", gap: 20 }}>
             <div>
               <label style={labelStyle}>Thumbnail Image URL</label>
               <input
                 style={inputStyle}
                 value={form.thumbnail}
-                onChange={(e) => { set("thumbnail", e.target.value); setThumbError(false); }}
+                onChange={(e) => {
+                  set("thumbnail", e.target.value);
+                  setThumbError(false);
+                }}
                 placeholder="https://example.com/thumbnail.jpg"
               />
               {form.thumbnail && (
                 <div style={{ marginTop: 12 }}>
                   {thumbError ? (
-                    <div style={{ width: 240, height: 135, borderRadius: 10, background: "#f3f0fa", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#9ca3af", border: "1px dashed #d1c4e9" }}>
+                    <div
+                      style={{
+                        width: 240,
+                        height: 135,
+                        borderRadius: 10,
+                        background: "#f3f0fa",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 12,
+                        color: "#9ca3af",
+                        border: "1px dashed #d1c4e9",
+                      }}
+                    >
                       Image not found
                     </div>
                   ) : (
@@ -808,7 +1297,13 @@ export default function CourseEditPage() {
                       src={form.thumbnail}
                       alt="Thumbnail"
                       onError={() => setThumbError(true)}
-                      style={{ width: 240, height: 135, objectFit: "cover", borderRadius: 10, border: "1px solid #e9e4f7" }}
+                      style={{
+                        width: 240,
+                        height: 135,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        border: "1px solid #e9e4f7",
+                      }}
                     />
                   )}
                 </div>
@@ -835,22 +1330,62 @@ export default function CourseEditPage() {
           <div
             style={{
               padding: "20px 24px",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
               borderBottom: "1px solid #f3f0fa",
             }}
           >
             <div>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1a1a2e" }}>Curriculum</h2>
-              <div style={{ marginTop: 4, display: "flex", gap: 14, fontSize: 12, color: "#6b7280" }}>
-                <span>{lessons.length} lesson{lessons.length !== 1 ? "s" : ""}</span>
-                {totalSec > 0 && <span>· {displayDuration(totalSec)} total</span>}
-                {lessons.length > 0 && <span>· {lessons.filter((l) => l.isPreview).length} free preview{lessons.filter((l) => l.isPreview).length !== 1 ? "s" : ""}</span>}
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: "#1a1a2e",
+                }}
+              >
+                Curriculum
+              </h2>
+              <div
+                style={{
+                  marginTop: 4,
+                  display: "flex",
+                  gap: 14,
+                  fontSize: 12,
+                  color: "#6b7280",
+                }}
+              >
+                <span>
+                  {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+                </span>
+                {totalSec > 0 && (
+                  <span>· {displayDuration(totalSec)} total</span>
+                )}
+                {lessons.length > 0 && (
+                  <span>
+                    · {lessons.filter((l) => l.isPreview).length} free preview
+                    {lessons.filter((l) => l.isPreview).length !== 1 ? "s" : ""}
+                  </span>
+                )}
               </div>
             </div>
             {!showAddForm && (
               <button
-                onClick={() => { setShowAddForm(true); setExpandedLesson(null); }}
-                style={{ background: purple, color: "#fff", border: "none", borderRadius: 10, padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                onClick={() => {
+                  setShowAddForm(true);
+                  setExpandedLesson(null);
+                }}
+                style={{
+                  background: purple,
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "9px 18px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
               >
                 + Add Lesson
               </button>
@@ -860,15 +1395,41 @@ export default function CourseEditPage() {
           {/* Empty state */}
           {lessons.length === 0 && !showAddForm && (
             <div style={{ padding: "40px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 44, marginBottom: 12 }}>🎬</div>
-              <h3 style={{ margin: "0 0 8px", color: "#1a1a2e", fontSize: 16, fontWeight: 800 }}>No lessons yet</h3>
-              <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 20px", lineHeight: 1.6 }}>
-                Add lessons to build your course curriculum.<br />
+              <div style={{ fontSize: 44, marginBottom: 12 }} />
+              <h3
+                style={{
+                  margin: "0 0 8px",
+                  color: "#1a1a2e",
+                  fontSize: 16,
+                  fontWeight: 800,
+                }}
+              >
+                No lessons yet
+              </h3>
+              <p
+                style={{
+                  color: "#6b7280",
+                  fontSize: 14,
+                  margin: "0 0 20px",
+                  lineHeight: 1.6,
+                }}
+              >
+                Add lessons to build your course curriculum.
+                <br />
                 You need at least 1 lesson before submitting for review.
               </p>
               <button
                 onClick={() => setShowAddForm(true)}
-                style={{ background: `linear-gradient(135deg, #8b6ef5, ${purple})`, color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                style={{
+                  background: `linear-gradient(135deg, #8b6ef5, ${purple})`,
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 24px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
               >
                 + Add First Lesson
               </button>
@@ -877,8 +1438,28 @@ export default function CourseEditPage() {
 
           {/* Lesson list */}
           {reordering && (
-            <div style={{ padding: "8px 24px", background: "#fef3c7", fontSize: 12, fontWeight: 600, color: "#92400e", display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 14, height: 14, border: "2px solid #92400e", borderTop: "2px solid transparent", borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />
+            <div
+              style={{
+                padding: "8px 24px",
+                background: "#fef3c7",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#92400e",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 14,
+                  height: 14,
+                  border: "2px solid #92400e",
+                  borderTop: "2px solid transparent",
+                  borderRadius: "50%",
+                  animation: "spin 0.6s linear infinite",
+                }}
+              />
               Reordering…
             </div>
           )}
@@ -910,15 +1491,37 @@ export default function CourseEditPage() {
 
           {/* Footer */}
           {lessons.length > 0 && !showAddForm && (
-            <div style={{ padding: "14px 24px", borderTop: "1px solid #f3f0fa", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div
+              style={{
+                padding: "14px 24px",
+                borderTop: "1px solid #f3f0fa",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <button
-                onClick={() => { setShowAddForm(true); setExpandedLesson(null); }}
-                style={{ background: purpleLight, color: purple, border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                onClick={() => {
+                  setShowAddForm(true);
+                  setExpandedLesson(null);
+                }}
+                style={{
+                  background: purpleLight,
+                  color: purple,
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "8px 18px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
               >
                 + Add Another Lesson
               </button>
               {totalSec > 0 && (
-                <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>
+                <span
+                  style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}
+                >
                   Total: {displayDuration(totalSec)}
                 </span>
               )}
@@ -927,14 +1530,26 @@ export default function CourseEditPage() {
         </div>
 
         {/* ── Bottom actions ── */}
-        <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            justifyContent: "flex-end",
+            marginTop: 8,
+          }}
+        >
           {courseStatus === "draft" && (
             <button
               onClick={handleSubmitForReview}
               disabled={saving}
               style={{
-                padding: "11px 24px", borderRadius: 12, fontSize: 14, fontWeight: 700,
-                border: `1.5px solid ${purple}`, background: "transparent", color: purple,
+                padding: "11px 24px",
+                borderRadius: 12,
+                fontSize: 14,
+                fontWeight: 700,
+                border: `1.5px solid ${purple}`,
+                background: "transparent",
+                color: purple,
                 cursor: saving ? "not-allowed" : "pointer",
               }}
             >
@@ -945,10 +1560,16 @@ export default function CourseEditPage() {
             onClick={handleSave}
             disabled={saving}
             style={{
-              padding: "11px 32px", borderRadius: 12, fontSize: 14, fontWeight: 800,
-              background: saving ? "#d1c4f7" : purple, color: "#fff",
-              border: "none", cursor: saving ? "not-allowed" : "pointer",
-              boxShadow: dirty && !saving ? "0 4px 14px rgba(95,73,153,0.35)" : "none",
+              padding: "11px 32px",
+              borderRadius: 12,
+              fontSize: 14,
+              fontWeight: 800,
+              background: saving ? "#d1c4f7" : purple,
+              color: "#fff",
+              border: "none",
+              cursor: saving ? "not-allowed" : "pointer",
+              boxShadow:
+                dirty && !saving ? "0 4px 14px rgba(95,73,153,0.35)" : "none",
             }}
           >
             {saving ? "Saving…" : "Save Changes"}

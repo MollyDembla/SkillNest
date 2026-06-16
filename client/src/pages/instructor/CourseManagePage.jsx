@@ -9,10 +9,10 @@ const purpleDark = "#3c3168";
 const purpleLight = "#ede9f8";
 
 const STATUS_CONFIG = {
-  published: { bg: "#dcfce7", color: "#16a34a", label: "Published", icon: "✅" },
-  draft: { bg: "#f3f4f6", color: "#6b7280", label: "Draft", icon: "📝" },
-  pending: { bg: "#fef3c7", color: "#d97706", label: "Pending Review", icon: "⏳" },
-  rejected: { bg: "#fee2e2", color: "#dc2626", label: "Rejected", icon: "❌" },
+  published: { bg: "#dcfce7", color: "#16a34a", label: "Published" },
+  draft: { bg: "#f3f4f6", color: "#6b7280", label: "Draft" },
+  pending: { bg: "#fef3c7", color: "#d97706", label: "Pending Review" },
+  rejected: { bg: "#fee2e2", color: "#dc2626", label: "Rejected" },
 };
 
 const SORT_OPTIONS = [
@@ -23,7 +23,11 @@ const SORT_OPTIONS = [
 ];
 
 function formatDate(d) {
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 // ─── Status Badge ─────────────────────────────────────────────
@@ -43,7 +47,7 @@ function StatusBadge({ status }) {
         borderRadius: 99,
       }}
     >
-      {cfg.icon} {cfg.label}
+      {cfg.label}
     </span>
   );
 }
@@ -67,7 +71,16 @@ function RejectionBanner({ reason }) {
       <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
         <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>⚠️</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#dc2626", marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: "#dc2626",
+              marginBottom: 3,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
             Rejection reason
           </div>
           <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>
@@ -76,7 +89,16 @@ function RejectionBanner({ reason }) {
           {reason.length > 80 && (
             <button
               onClick={() => setExpanded(!expanded)}
-              style={{ background: "none", border: "none", color: "#dc2626", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: "4px 0 0", marginTop: 2 }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#dc2626",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                padding: "4px 0 0",
+                marginTop: 2,
+              }}
             >
               {expanded ? "Show less" : "Read more"}
             </button>
@@ -92,12 +114,13 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
   const cfg = STATUS_CONFIG[course.status] || STATUS_CONFIG.draft;
   const busy = actionLoading === course._id;
 
-  const levelLabel = {
-    beginner: "Beginner",
-    intermediate: "Intermediate",
-    advanced: "Advanced",
-    all: "All levels",
-  }[course.level] || course.level;
+  const levelLabel =
+    {
+      beginner: "Beginner",
+      intermediate: "Intermediate",
+      advanced: "Advanced",
+      all: "All levels",
+    }[course.level] || course.level;
 
   const primaryAction = () => {
     if (course.status === "draft") {
@@ -117,7 +140,7 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
             cursor: busy ? "not-allowed" : "pointer",
           }}
         >
-          {busy ? "Submitting…" : "📤 Submit for Review"}
+          {busy ? "Submitting…" : "Submit for Review"}
         </button>
       );
     }
@@ -137,7 +160,7 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
             gap: 6,
           }}
         >
-          <span style={{ fontSize: 16 }}>⏳</span> Under Admin Review
+          Under Admin Review
         </span>
       );
     }
@@ -157,7 +180,7 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
             textAlign: "center",
           }}
         >
-          👁️ View Course
+          View Course
         </Link>
       );
     }
@@ -178,7 +201,7 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
             cursor: busy ? "not-allowed" : "pointer",
           }}
         >
-          {busy ? "Updating…" : "✏️ Move to Draft & Fix"}
+          {busy ? "Updating…" : "Move to Draft & Fix"}
         </button>
       );
     }
@@ -195,7 +218,10 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
         display: "flex",
         flexDirection: "column",
         transition: "transform 0.15s, box-shadow 0.15s",
-        border: course.status === "rejected" ? "1.5px solid #fecaca" : "1.5px solid transparent",
+        border:
+          course.status === "rejected"
+            ? "1.5px solid #fecaca"
+            : "1.5px solid transparent",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
@@ -207,37 +233,67 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
       }}
     >
       {/* Thumbnail */}
-      <div style={{ position: "relative", paddingTop: "52.5%", background: "#e9e4f7", flexShrink: 0 }}>
+      <div
+        style={{
+          position: "relative",
+          paddingTop: "52.5%",
+          background: "#e9e4f7",
+          flexShrink: 0,
+        }}
+      >
         {course.thumbnail ? (
           <img
             src={course.thumbnail}
             alt={course.title}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
           />
         ) : (
           <div
             style={{
-              position: "absolute", inset: 0, display: "flex",
-              alignItems: "center", justifyContent: "center", fontSize: 44, color: "#c4b5e8",
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 44,
+              color: "#c4b5e8",
             }}
           >
-            📚
+            <div>No thumbnail</div>
           </div>
         )}
         <span
           style={{
-            position: "absolute", top: 10, left: 10,
-            background: cfg.bg, color: cfg.color,
-            fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 99,
+            position: "absolute",
+            top: 10,
+            left: 10,
+            background: cfg.bg,
+            color: cfg.color,
+            fontSize: 11,
+            fontWeight: 700,
+            padding: "4px 10px",
+            borderRadius: 99,
           }}
         >
           {cfg.icon} {cfg.label}
         </span>
         <span
           style={{
-            position: "absolute", top: 10, right: 10,
-            background: "rgba(0,0,0,0.6)", color: "#fff",
-            fontSize: 12, fontWeight: 800, padding: "4px 10px", borderRadius: 99,
+            position: "absolute",
+            top: 10,
+            right: 10,
+            background: "rgba(0,0,0,0.6)",
+            color: "#fff",
+            fontSize: 12,
+            fontWeight: 800,
+            padding: "4px 10px",
+            borderRadius: 99,
           }}
         >
           {course.price === 0 ? "Free" : `$${course.price.toFixed(2)}`}
@@ -245,7 +301,15 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
       </div>
 
       {/* Body */}
-      <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+      <div
+        style={{
+          padding: "16px 18px",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
         {/* Rejection reason (if applicable) */}
         {course.status === "rejected" && (
           <RejectionBanner reason={course.rejectionReason} />
@@ -254,8 +318,15 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
         {/* Title */}
         <h3
           style={{
-            margin: 0, fontSize: 15, fontWeight: 800, color: "#1a1a2e", lineHeight: 1.35,
-            display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+            margin: 0,
+            fontSize: 15,
+            fontWeight: 800,
+            color: "#1a1a2e",
+            lineHeight: 1.35,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
           {course.title}
@@ -264,12 +335,30 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
         {/* Category + Level */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {course.category && (
-            <span style={{ fontSize: 11, fontWeight: 700, background: purpleLight, color: purple, padding: "3px 9px", borderRadius: 99 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                background: purpleLight,
+                color: purple,
+                padding: "3px 9px",
+                borderRadius: 99,
+              }}
+            >
               {course.category}
             </span>
           )}
           {course.level && (
-            <span style={{ fontSize: 11, fontWeight: 600, background: "#f3f4f6", color: "#6b7280", padding: "3px 9px", borderRadius: 99 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                background: "#f3f4f6",
+                color: "#6b7280",
+                padding: "3px 9px",
+                borderRadius: 99,
+              }}
+            >
               {levelLabel}
             </span>
           )}
@@ -278,7 +367,10 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
         {/* Rating */}
         <div style={{ fontSize: 12, color: "#6b7280" }}>
           {course.averageRating > 0 ? (
-            <span>⭐ {course.averageRating.toFixed(1)} · {course.reviewsCount} review{course.reviewsCount !== 1 ? "s" : ""}</span>
+            <span>
+              {course.averageRating.toFixed(1)} · {course.reviewsCount} review
+              {course.reviewsCount !== 1 ? "s" : ""}
+            </span>
           ) : (
             <span style={{ color: "#d1d5db" }}>No reviews yet</span>
           )}
@@ -287,13 +379,13 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
         {/* Stats row */}
         <div style={{ display: "flex", gap: 14, fontSize: 12 }}>
           <span style={{ color: "#374151", fontWeight: 600 }}>
-            📖 {course.lessonCount} lesson{course.lessonCount !== 1 ? "s" : ""}
+            Lessons: {course.lessonCount}
           </span>
           <span style={{ color: "#374151", fontWeight: 600 }}>
-            👥 {course.enrollmentCount} student{course.enrollmentCount !== 1 ? "s" : ""}
+            Students: {course.enrollmentCount}
           </span>
           <span style={{ color: "#16a34a", fontWeight: 700 }}>
-            💰 ${course.revenue.toFixed(2)}
+            Revenue: ${course.revenue.toFixed(2)}
           </span>
         </div>
 
@@ -303,32 +395,49 @@ function CourseCard({ course, onStatusChange, onDelete, actionLoading }) {
       </div>
 
       {/* Action bar */}
-      <div style={{ padding: "12px 18px", borderTop: "1px solid #f3f0fa", display: "flex", gap: 8, alignItems: "center" }}>
+      <div
+        style={{
+          padding: "12px 18px",
+          borderTop: "1px solid #f3f0fa",
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+        }}
+      >
         {primaryAction()}
 
         <Link
           to={`/instructor/courses/${course._id}/edit`}
           title="Edit course"
           style={{
-            background: purpleLight, color: purple,
-            borderRadius: 10, padding: "8px 14px",
-            fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0,
+            background: purpleLight,
+            color: purple,
+            borderRadius: 10,
+            padding: "8px 14px",
+            fontSize: 13,
+            fontWeight: 700,
+            textDecoration: "none",
+            flexShrink: 0,
           }}
         >
-          ✏️
+          Edit
         </Link>
 
         <button
           onClick={() => onDelete(course._id, course.title)}
           title="Delete course"
           style={{
-            background: "#fee2e2", color: "#dc2626",
-            border: "none", borderRadius: 10,
-            padding: "8px 12px", fontSize: 13,
-            cursor: "pointer", flexShrink: 0,
+            background: "#fee2e2",
+            color: "#dc2626",
+            border: "none",
+            borderRadius: 10,
+            padding: "8px 12px",
+            fontSize: 13,
+            cursor: "pointer",
+            flexShrink: 0,
           }}
         >
-          🗑️
+          Delete
         </button>
       </div>
     </div>
@@ -340,37 +449,67 @@ function DeleteModal({ target, onConfirm, onCancel, deleting }) {
   return (
     <div
       style={{
-        position: "fixed", inset: 0,
+        position: "fixed",
+        inset: 0,
         background: "rgba(0,0,0,0.45)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        zIndex: 1000, padding: 24,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        padding: 24,
       }}
       onClick={onCancel}
     >
       <div
         style={{
-          background: "#fff", borderRadius: 20, padding: "32px 28px",
-          maxWidth: 420, width: "100%",
+          background: "#fff",
+          borderRadius: 20,
+          padding: "32px 28px",
+          maxWidth: 420,
+          width: "100%",
           boxShadow: "0 24px 64px rgba(0,0,0,0.18)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: 40, textAlign: "center", marginBottom: 16 }}>🗑️</div>
-        <h3 style={{ margin: "0 0 10px", fontSize: 20, fontWeight: 800, color: "#1a1a2e", textAlign: "center" }}>
+        <div style={{ fontSize: 40, textAlign: "center", marginBottom: 16 }} />
+        <h3
+          style={{
+            margin: "0 0 10px",
+            fontSize: 20,
+            fontWeight: 800,
+            color: "#1a1a2e",
+            textAlign: "center",
+          }}
+        >
           Delete Course?
         </h3>
-        <p style={{ margin: "0 0 24px", fontSize: 14, color: "#6b7280", textAlign: "center", lineHeight: 1.6 }}>
-          <strong style={{ color: "#1a1a2e" }}>"{target.title}"</strong> will be permanently
-          deleted. Students will lose access and this cannot be undone.
+        <p
+          style={{
+            margin: "0 0 24px",
+            fontSize: 14,
+            color: "#6b7280",
+            textAlign: "center",
+            lineHeight: 1.6,
+          }}
+        >
+          <strong style={{ color: "#1a1a2e" }}>"{target.title}"</strong> will be
+          permanently deleted. Students will lose access and this cannot be
+          undone.
         </p>
         <div style={{ display: "flex", gap: 12 }}>
           <button
             onClick={onCancel}
             disabled={deleting}
             style={{
-              flex: 1, background: "#f3f4f6", color: "#374151",
-              border: "none", borderRadius: 12, padding: "12px",
-              fontSize: 14, fontWeight: 700, cursor: "pointer",
+              flex: 1,
+              background: "#f3f4f6",
+              color: "#374151",
+              border: "none",
+              borderRadius: 12,
+              padding: "12px",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
             }}
           >
             Cancel
@@ -379,9 +518,14 @@ function DeleteModal({ target, onConfirm, onCancel, deleting }) {
             onClick={onConfirm}
             disabled={deleting}
             style={{
-              flex: 1, background: deleting ? "#fecaca" : "#dc2626",
-              color: "#fff", border: "none", borderRadius: 12, padding: "12px",
-              fontSize: 14, fontWeight: 700,
+              flex: 1,
+              background: deleting ? "#fecaca" : "#dc2626",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              padding: "12px",
+              fontSize: 14,
+              fontWeight: 700,
               cursor: deleting ? "not-allowed" : "pointer",
             }}
           >
@@ -478,26 +622,66 @@ export default function CourseManagePage() {
   const hasFilter = search || statusFilter !== "all";
 
   return (
-    <div style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}>
+    <div
+      style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}
+    >
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* ── Hero ── */}
-      <div style={{ background: `linear-gradient(135deg, ${purpleDark} 0%, ${purple} 100%)` }}>
+      <div
+        style={{
+          background: `linear-gradient(135deg, ${purpleDark} 0%, ${purple} 100%)`,
+        }}
+      >
         <div
           style={{
-            maxWidth: 1100, margin: "0 auto",
+            maxWidth: 1100,
+            margin: "0 auto",
             padding: "36px 24px 50px",
-            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
           }}
         >
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-              <Link to="/instructor/dashboard" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 10,
+              }}
+            >
+              <Link
+                to="/instructor/dashboard"
+                style={{
+                  color: "rgba(255,255,255,0.5)",
+                  textDecoration: "none",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
                 ← Dashboard
               </Link>
             </div>
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#fff" }}>My Courses</h1>
-            <p style={{ margin: "6px 0 0", fontSize: 14, color: "rgba(255,255,255,0.65)" }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 26,
+                fontWeight: 900,
+                color: "#fff",
+              }}
+            >
+              My Courses
+            </h1>
+            <p
+              style={{
+                margin: "6px 0 0",
+                fontSize: 14,
+                color: "rgba(255,255,255,0.65)",
+              }}
+            >
               {allCourses.length > 0
                 ? `${allCourses.length} course${allCourses.length !== 1 ? "s" : ""} total`
                 : "Build, publish and grow your courses"}
@@ -506,10 +690,15 @@ export default function CourseManagePage() {
           <Link
             to="/instructor/courses/create"
             style={{
-              background: "#fff", color: purple,
-              borderRadius: 12, padding: "11px 22px",
-              fontWeight: 800, fontSize: 14, textDecoration: "none",
-              flexShrink: 0, boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+              background: "#fff",
+              color: purple,
+              borderRadius: 12,
+              padding: "11px 22px",
+              fontWeight: 800,
+              fontSize: 14,
+              textDecoration: "none",
+              flexShrink: 0,
+              boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
             }}
           >
             + Create Course
@@ -517,39 +706,58 @@ export default function CourseManagePage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: "-26px auto 0", padding: "0 24px" }}>
-
+      <div
+        style={{ maxWidth: 1100, margin: "-26px auto 0", padding: "0 24px" }}
+      >
         {/* ── Filter bar ── */}
         <div
           style={{
-            background: "#fff", borderRadius: 16,
+            background: "#fff",
+            borderRadius: 16,
             padding: "16px 20px",
             boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
             marginBottom: 24,
           }}
         >
           {/* Top row: search + sort */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              marginBottom: 14,
+              flexWrap: "wrap",
+            }}
+          >
             {/* Search */}
-            <div style={{ position: "relative", flex: "1 1 220px", minWidth: 180 }}>
+            <div
+              style={{ position: "relative", flex: "1 1 220px", minWidth: 180 }}
+            >
               <span
                 style={{
-                  position: "absolute", left: 12, top: "50%",
-                  transform: "translateY(-50%)", fontSize: 14, color: "#9ca3af", pointerEvents: "none",
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontSize: 14,
+                  color: "#9ca3af",
+                  pointerEvents: "none",
                 }}
-              >
-                🔍
-              </span>
+              />
               <input
                 type="text"
                 placeholder="Search by title…"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 style={{
-                  width: "100%", padding: "9px 12px 9px 36px",
-                  border: "1.5px solid #e9e4f7", borderRadius: 10,
-                  fontSize: 14, color: "#1a1a2e", outline: "none",
-                  boxSizing: "border-box", background: "#faf8ff",
+                  width: "100%",
+                  padding: "9px 12px 9px 12px",
+                  border: "1.5px solid #e9e4f7",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  color: "#1a1a2e",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  background: "#faf8ff",
                 }}
               />
             </div>
@@ -559,14 +767,22 @@ export default function CourseManagePage() {
               value={sort}
               onChange={(e) => setSort(e.target.value)}
               style={{
-                padding: "9px 14px", border: "1.5px solid #e9e4f7",
-                borderRadius: 10, fontSize: 13, fontWeight: 600,
-                color: "#374151", background: "#faf8ff", cursor: "pointer",
-                outline: "none", flexShrink: 0,
+                padding: "9px 14px",
+                border: "1.5px solid #e9e4f7",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#374151",
+                background: "#faf8ff",
+                cursor: "pointer",
+                outline: "none",
+                flexShrink: 0,
               }}
             >
               {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
               ))}
             </select>
           </div>
@@ -582,24 +798,32 @@ export default function CourseManagePage() {
                   key={s}
                   onClick={() => setStatusFilter(s)}
                   style={{
-                    border: "none", borderRadius: 99,
+                    border: "none",
+                    borderRadius: 99,
                     padding: "7px 14px",
-                    fontSize: 13, fontWeight: 700, cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
                     background: active ? purple : "#f3f0fa",
                     color: active ? "#fff" : "#6b7280",
-                    display: "flex", alignItems: "center", gap: 5,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
                     transition: "background 0.15s, color 0.15s",
                   }}
                 >
-                  {cfg?.icon || "📋"}
                   {s === "all" ? "All" : cfg?.label || s}
                   {count > 0 && (
                     <span
                       style={{
-                        fontSize: 10, fontWeight: 800,
-                        background: active ? "rgba(255,255,255,0.25)" : purpleLight,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        background: active
+                          ? "rgba(255,255,255,0.25)"
+                          : purpleLight,
                         color: active ? "#fff" : purple,
-                        padding: "1px 6px", borderRadius: 99,
+                        padding: "1px 6px",
+                        borderRadius: 99,
                       }}
                     >
                       {count}
@@ -613,42 +837,77 @@ export default function CourseManagePage() {
 
         {/* ── Content ── */}
         {loading ? (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 0", gap: 14 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "80px 0",
+              gap: 14,
+            }}
+          >
             <div
               style={{
-                width: 44, height: 44,
-                border: `4px solid ${purpleLight}`, borderTop: `4px solid ${purple}`,
-                borderRadius: "50%", animation: "spin 0.8s linear infinite",
+                width: 44,
+                height: 44,
+                border: `4px solid ${purpleLight}`,
+                borderTop: `4px solid ${purple}`,
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
               }}
             />
-            <p style={{ color: "#9b8ec4", margin: 0, fontSize: 14 }}>Loading your courses…</p>
+            <p style={{ color: "#9b8ec4", margin: 0, fontSize: 14 }}>
+              Loading your courses…
+            </p>
           </div>
         ) : courses.length === 0 ? (
           <div
             style={{
-              background: "#fff", borderRadius: 20,
-              padding: "64px 24px", textAlign: "center",
+              background: "#fff",
+              borderRadius: 20,
+              padding: "64px 24px",
+              textAlign: "center",
               boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
             }}
           >
-            <div style={{ fontSize: 56, marginBottom: 16 }}>
-              {hasFilter ? "🔍" : "📭"}
-            </div>
-            <h3 style={{ color: "#1a1a2e", margin: "0 0 8px", fontSize: 20, fontWeight: 800 }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }} />
+            <h3
+              style={{
+                color: "#1a1a2e",
+                margin: "0 0 8px",
+                fontSize: 20,
+                fontWeight: 800,
+              }}
+            >
               {hasFilter ? "No courses match your filters" : "No courses yet"}
             </h3>
-            <p style={{ color: "#6b7280", margin: "0 0 24px", fontSize: 14, lineHeight: 1.6 }}>
+            <p
+              style={{
+                color: "#6b7280",
+                margin: "0 0 24px",
+                fontSize: 14,
+                lineHeight: 1.6,
+              }}
+            >
               {hasFilter
                 ? "Try a different search term or status filter."
                 : "Create your first course and start teaching on SkillNest."}
             </p>
             {hasFilter ? (
               <button
-                onClick={() => { setSearchInput(""); setStatusFilter("all"); }}
+                onClick={() => {
+                  setSearchInput("");
+                  setStatusFilter("all");
+                }}
                 style={{
-                  background: purpleLight, color: purple,
-                  border: "none", borderRadius: 10,
-                  padding: "10px 24px", fontWeight: 700, fontSize: 14, cursor: "pointer",
+                  background: purpleLight,
+                  color: purple,
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 24px",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: "pointer",
                 }}
               >
                 Clear Filters
@@ -658,8 +917,12 @@ export default function CourseManagePage() {
                 to="/instructor/courses/create"
                 style={{
                   background: `linear-gradient(135deg, #8b6ef5, ${purple})`,
-                  color: "#fff", borderRadius: 12,
-                  padding: "12px 28px", fontWeight: 800, fontSize: 14, textDecoration: "none",
+                  color: "#fff",
+                  borderRadius: 12,
+                  padding: "12px 28px",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  textDecoration: "none",
                 }}
               >
                 Create Your First Course
@@ -669,7 +932,14 @@ export default function CourseManagePage() {
         ) : (
           <>
             {/* Result count */}
-            <div style={{ fontSize: 13, color: "#9b8ec4", fontWeight: 600, marginBottom: 16 }}>
+            <div
+              style={{
+                fontSize: 13,
+                color: "#9b8ec4",
+                fontWeight: 600,
+                marginBottom: 16,
+              }}
+            >
               Showing {courses.length} course{courses.length !== 1 ? "s" : ""}
               {hasFilter ? ` (filtered)` : ""}
             </div>
