@@ -68,6 +68,8 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
+
+
 // 8. Register Route groups
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);

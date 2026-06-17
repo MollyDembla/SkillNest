@@ -38,8 +38,12 @@ const register = async (userData) => {
   await Cart.create({ user: user._id, items: [] });
   await Wishlist.create({ user: user._id, courses: [] });
 
+  
+
   // 5. Send verification email (non-blocking in dev, catches internally)
-  await emailService.sendVerificationEmail(user, rawToken);
+  //await emailService.sendVerificationEmail(user, rawToken);
+
+  
 
   return user;
 };
