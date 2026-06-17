@@ -498,7 +498,18 @@ export default function LearningPlayerPage() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
-          .sidebar-overlay { position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 100 !important; width: 280px !important; box-shadow: -8px 0 32px rgba(0,0,0,0.5) !important; }
+          .player-layout { flex-direction: column !important; overflow: visible !important; }
+          .player-main { overflow-y: visible !important; }
+          .sidebar-overlay {
+            position: static !important;
+            width: 100% !important;
+            max-height: 320px !important;
+            box-shadow: none !important;
+            border-left: none !important;
+            border-top: 1px solid rgba(255,255,255,0.07) !important;
+          }
+          .player-topbar-progress { display: none !important; }
+          .player-topbar-title { max-width: 120px !important; font-size: 12px !important; }
         }
       `}</style>
 
@@ -541,6 +552,7 @@ export default function LearningPlayerPage() {
         </button>
 
         <h1
+          className="player-topbar-title"
           style={{
             margin: 0,
             flex: 1,
@@ -556,7 +568,7 @@ export default function LearningPlayerPage() {
         </h1>
 
         {/* Progress bar + % */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <div className="player-topbar-progress" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <div
             style={{
               width: 110,
@@ -601,10 +613,10 @@ export default function LearningPlayerPage() {
       </div>
 
       {/* ── Body ── */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+      <div className="player-layout" style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
         {/* Main content */}
-        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+        <div className="player-main" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
 
           {/* Video */}
           <div style={{ background: "#0d0b14", flexShrink: 0 }}>

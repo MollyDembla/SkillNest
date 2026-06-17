@@ -61,8 +61,18 @@ export default function CourseCatalogPage() {
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
+      <style>{`
+        @media (max-width: 600px) {
+          .catalog-header { padding: 20px 16px !important; }
+          .catalog-body { padding: 20px 16px !important; }
+          .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; gap: 12px !important; }
+          .catalog-filters { flex-direction: column !important; align-items: flex-start !important; }
+          .catalog-sort-group { margin-left: 0 !important; width: 100%; display: flex; gap: 8px; }
+          .catalog-sort-group select { flex: 1; }
+        }
+      `}</style>
       {/* Page header */}
-      <div style={{ background: "#f7f9fa", borderBottom: "1px solid #e8e8e8", padding: "32px 24px" }}>
+      <div className="catalog-header" style={{ background: "#f7f9fa", borderBottom: "1px solid #e8e8e8", padding: "32px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <h1 style={{ fontSize: 30, fontWeight: 900, color: "#1c1d1f", margin: "0 0 4px" }}>
             All Courses
@@ -73,9 +83,10 @@ export default function CourseCatalogPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px" }}>
+      <div className="catalog-body" style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px" }}>
         {/* Filters */}
         <div
+          className="catalog-filters"
           style={{
             display: "flex",
             gap: 12,
@@ -112,7 +123,7 @@ export default function CourseCatalogPage() {
             })}
           </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+          <div className="catalog-sort-group" style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
             {/* Level */}
             <select
               value={level}
@@ -171,6 +182,7 @@ export default function CourseCatalogPage() {
           </div>
         ) : (
           <div
+            className="catalog-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",

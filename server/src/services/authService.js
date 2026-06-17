@@ -41,7 +41,7 @@ const register = async (userData) => {
   
 
   // 5. Send verification email (non-blocking in dev, catches internally)
-  //await emailService.sendVerificationEmail(user, rawToken);
+  await emailService.sendVerificationEmail(user, rawToken);
 
   
 

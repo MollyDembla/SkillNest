@@ -51,3 +51,140 @@ iframe[name^="__privateStripeMetricsController"] {
   width: 0 !important;
   height: 0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   GLOBAL RESPONSIVE UTILITIES
+═══════════════════════════════════════════════════════ */
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Course Detail Page Responsive ── */
+@media (max-width: 900px) {
+  .course-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .course-detail-sidebar {
+    position: static !important;
+    top: auto !important;
+  }
+  .course-hero-thumb {
+    display: none !important;
+  }
+  .course-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Navbar Responsive ── */
+.navbar-mobile-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-links-desktop {
+    display: none !important;
+  }
+  .navbar-mobile-menu {
+    display: flex !important;
+  }
+  .navbar-search {
+    max-width: 100% !important;
+    flex: 1 !important;
+  }
+}
+
+/* ── Auth pages Responsive ── */
+@media (max-width: 480px) {
+  .auth-shell-card {
+    padding: 28px 20px !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ── Cart & Checkout Responsive ── */
+@media (max-width: 800px) {
+  .cart-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .checkout-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── My Learning Page Responsive ── */
+@media (max-width: 600px) {
+  .my-learning-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .my-learning-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Learning Player Responsive ── */
+@media (max-width: 768px) {
+  .player-body {
+    flex-direction: column !important;
+  }
+  .player-sidebar {
+    width: 100% !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(255,255,255,0.07) !important;
+  }
+  .player-topbar-title {
+    font-size: 12px !important;
+    max-width: 140px !important;
+  }
+  .player-progress-bar {
+    width: 70px !important;
+  }
+}
+
+/* ── Admin / Instructor Pages Responsive ── */
+@media (max-width: 900px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .instructor-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .instructor-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Hero sections ── */
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: clamp(22px, 6vw, 36px) !important;
+  }
+}
+
+/* ── Tables ── */
+@media (max-width: 700px) {
+  .responsive-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

@@ -393,15 +393,24 @@ export default function InstructorDashboardPage() {
           from { opacity: 0; transform: translateY(14px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .dash-fadein { animation: fadeUp 0.4s ease both; }
         .dash-fadein-d1 { animation-delay: 0.05s; }
         .dash-fadein-d2 { animation-delay: 0.1s; }
         .dash-fadein-d3 { animation-delay: 0.15s; }
+        .instructor-two-col { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+        @media (max-width: 900px) {
+          .instructor-two-col { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          .dash-hero-inner { padding: 28px 16px 52px !important; flex-direction: column !important; align-items: flex-start !important; }
+          .dash-content-area { padding: 0 16px 40px !important; }
+        }
       `}</style>
 
       {/* ── Hero Banner ── */}
       <div style={{ background: `linear-gradient(130deg, ${C.brandDark} 0%, ${C.brand} 100%)` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 28px 68px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+        <div className="dash-hero-inner" style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 28px 68px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
           <div className="dash-fadein" style={{ display: "flex", alignItems: "center", gap: 18 }}>
             {/* Avatar */}
             <div style={{
@@ -468,7 +477,7 @@ export default function InstructorDashboardPage() {
       </div>
 
       {/* ── Main Content ── */}
-      <div style={{ maxWidth: 1160, margin: "-36px auto 0", padding: "0 28px 60px" }}>
+      <div className="dash-content-area" style={{ maxWidth: 1160, margin: "-36px auto 0", padding: "0 28px 60px" }}>
 
         {/* ── Metric Cards ── */}
         <div className="dash-fadein dash-fadein-d1" style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 28 }}>
@@ -480,7 +489,7 @@ export default function InstructorDashboardPage() {
         </div>
 
         {/* ── Two-column layout ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
+        <div className="instructor-two-col">
 
           {/* LEFT — Courses table */}
           <div className="dash-fadein dash-fadein-d2">

@@ -35,14 +35,19 @@ const markLessonComplete = asyncHandler(async (req, res, next) => {
 
   const totalLessons = await Lesson.countDocuments({ course: courseId });
 
-  const progress = await Progress.findOneAndUpdate(
-    { student: req.user._id, course: courseId },
-    {
-      $addToSet: { completedLessons: lessonId },
-      $setOnInsert: { student: req.user._id, course: courseId },
-    },
-    { upsert: true, new: true }
-  );
+  // Use findOne + save instead of findOneAndUpdate with upsert to avoid duplicate key race conditions
+  let progress = await Progress.findOne({ student: req.user._id, course: courseId });
+  if (!progress) {
+    progress = new Progress({ student: req.user._id, course: courseId, completedLessons: [] });
+  }
+
+  // Add lesson if not already in the completed set
+  const lessonIdStr = lessonId.toString();
+  const alreadyCompleted = progress.completedLessons.some((id) => id.toString() === lessonIdStr);
+  if (!alreadyCompleted) {
+    progress.completedLessons.push(lessonId);
+    await progress.save();
+  }
 
   const completedCount = progress.completedLessons.length;
   const percentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;

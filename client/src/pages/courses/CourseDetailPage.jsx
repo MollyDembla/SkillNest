@@ -355,8 +355,59 @@ export default function CourseDetailPage() {
   const visibleLessons = showAllLessons ? lessons : lessons.slice(0, 6);
   const currentUserId = user?.id || user?._id;
 
+  const courseDetailStyles = `
+    .course-detail-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+    .course-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+      align-items: start;
+    }
+    .course-detail-sidebar {
+      position: sticky;
+      top: 24px;
+    }
+    .course-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: start;
+    }
+    .course-hero-thumb {
+      width: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    @media (max-width: 900px) {
+      .course-detail-grid {
+        grid-template-columns: 1fr;
+      }
+      .course-detail-sidebar {
+        position: static;
+        top: auto;
+      }
+      .course-hero-thumb {
+        display: none;
+      }
+      .course-hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      .course-detail-body {
+        padding: 20px 16px 40px;
+      }
+    }
+  `;
+
   return (
     <div style={{ background: "#f7f1fb", minHeight: "100vh" }}>
+      <style>{courseDetailStyles}</style>
 
       {/* ── Hero banner ── */}
       <div
@@ -377,7 +428,7 @@ export default function CourseDetailPage() {
             }}
           />
         )}
-        <div style={{ position: "relative", maxWidth: 1100, margin: "0 auto", padding: "44px 24px 52px" }}>
+        <div style={{ position: "relative", maxWidth: 1100, margin: "0 auto", padding: "clamp(24px, 4vw, 44px) clamp(16px, 4vw, 24px) 52px" }}>
           {/* Breadcrumb */}
           <div style={{ fontSize: 12, marginBottom: 20, color: "rgba(255,255,255,0.45)", display: "flex", gap: 6, alignItems: "center" }}>
             <Link to="/courses" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 600 }}>Courses</Link>
@@ -385,7 +436,7 @@ export default function CourseDetailPage() {
             <span style={{ color: "rgba(255,255,255,0.35)" }}>{course.category}</span>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 32, alignItems: "start" }}>
+          <div className="course-hero-grid">
             <div>
               {/* Pills */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
@@ -401,7 +452,7 @@ export default function CourseDetailPage() {
                 )}
               </div>
 
-              <h1 style={{ color: "#fff", margin: "0 0 12px", fontSize: 30, fontWeight: 900, lineHeight: 1.25, maxWidth: 620 }}>
+              <h1 style={{ color: "#fff", margin: "0 0 12px", fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 900, lineHeight: 1.25, maxWidth: 620 }}>
                 {course.title}
               </h1>
               {course.subtitle && (
@@ -437,9 +488,9 @@ export default function CourseDetailPage() {
               </div>
             </div>
 
-            {/* Hero thumbnail (hidden on small screens via inline) */}
+            {/* Hero thumbnail */}
             {course.thumbnail && (
-              <div style={{ width: 200, borderRadius: 16, overflow: "hidden", flexShrink: 0 }}>
+              <div className="course-hero-thumb">
                 <img src={course.thumbnail} alt={course.title} style={{ width: "100%", display: "block" }} />
               </div>
             )}
@@ -448,8 +499,8 @@ export default function CourseDetailPage() {
       </div>
 
       {/* ── Body ── */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 60px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 28, alignItems: "start" }}>
+      <div className="course-detail-body">
+        <div className="course-detail-grid">
 
           {/* ── Left column ── */}
           <div style={{ minWidth: 0 }}>
@@ -644,7 +695,7 @@ export default function CourseDetailPage() {
           </div>
 
           {/* ── Right sidebar (sticky) ── */}
-          <div style={{ position: "sticky", top: 24 }}>
+          <div className="course-detail-sidebar">
             <div style={{ background: "#fff", borderRadius: 20, boxShadow: "0 8px 40px rgba(95,73,153,0.13)", overflow: "hidden" }}>
               {/* Thumbnail */}
               {course.thumbnail && (

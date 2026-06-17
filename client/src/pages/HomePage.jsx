@@ -86,9 +86,21 @@ export default function HomePage() {
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 600px) {
+          .home-hero { padding: 52px 16px !important; }
+          .home-hero-search { flex-direction: column !important; }
+          .home-hero-search input { border-radius: 4px !important; }
+          .home-hero-search button { border-radius: 4px !important; padding: 13px !important; }
+          .home-cta-grid { grid-template-columns: 1fr !important; text-align: center; }
+          .home-categories { padding: 36px 16px 24px !important; }
+          .home-section { padding: 36px 16px !important; }
+        }
+      `}</style>
 
       {/* ── Hero ── */}
-      <section style={{ background: "linear-gradient(135deg, #3c3168 0%, #5f4999 100%)", color: "#fff", padding: "80px 24px" }}>
+      <section className="home-hero" style={{ background: "linear-gradient(135deg, #3c3168 0%, #5f4999 100%)", color: "#fff", padding: "80px 24px" }}>
         <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
           <h1
             style={{
@@ -105,7 +117,7 @@ export default function HomePage() {
             Join thousands of students learning in-demand skills from expert instructors.
           </p>
 
-          <form onSubmit={handleSearch} style={{ display: "flex", maxWidth: 520, margin: "0 auto" }}>
+          <form onSubmit={handleSearch} className="home-hero-search" style={{ display: "flex", maxWidth: 520, margin: "0 auto" }}>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -339,7 +351,7 @@ export default function HomePage() {
 
       {/* ── Instructor CTA ── */}
       <section style={{ background: "linear-gradient(135deg, #3c3168 0%, #5f4999 100%)", padding: "64px 24px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: 32 }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: 32, flexWrap: "wrap" }} className="home-cta-grid">
           <div>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
               Share your knowledge. Earn money.
@@ -389,7 +401,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

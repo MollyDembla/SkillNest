@@ -295,6 +295,14 @@ export default function MyLearningPage() {
 
   return (
     <div style={{ background: "#f7f1fb", minHeight: "100vh", paddingBottom: 60 }}>
+      <style>{`
+        @media (max-width: 600px) {
+          .my-learning-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+        }
+        @media (max-width: 400px) {
+          .my-learning-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       {/* ── Hero ── */}
       <div style={{ background: `linear-gradient(135deg, #1e1340 0%, ${purpleDark} 50%, ${purple} 100%)` }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "44px 24px 52px" }}>
@@ -537,10 +545,11 @@ export default function MyLearningPage() {
         {!loading && !error && visible.length > 0 && (
           <>
             <div
+              className="my-learning-grid"
               style={{
                 display: "grid",
                 gap: 20,
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
               }}
             >
               {visible.map((enrollment) => (
