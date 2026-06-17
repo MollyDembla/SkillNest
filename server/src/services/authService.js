@@ -40,8 +40,10 @@ const register = async (userData) => {
 
   
 
-  // 5. Send verification email (non-blocking in dev, catches internally)
-  await emailService.sendVerificationEmail(user, rawToken);
+  // 5. Send verification email (non-blocking, logs failures asynchronously)
+  emailService.sendVerificationEmail(user, rawToken).catch((err) => {
+    console.error('Email verification sending failed on register:', err);
+  });
 
   
 

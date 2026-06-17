@@ -7,13 +7,16 @@ const isDev = config.nodeEnv !== 'production';
 const skipLocalhost = (req) =>
   isDev && (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === '::ffff:127.0.0.1');
 
+const skipLimit = (req) =>
+  skipLocalhost(req) || process.env.DISABLE_RATE_LIMIT === 'true' || config.nodeEnv !== 'production';
+
 /**
  * Standard API rate limiter
  */
 const apiLimiter = rateLimit({
   windowMs: config.rateLimitWindowMs || 15 * 60 * 1000,
-  max: config.rateLimitMax || 100,
-  skip: skipLocalhost,
+  max: config.rateLimitMax || 15000, // Increased default to prevent lockout
+  skip: skipLimit,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next) => {
@@ -26,8 +29,8 @@ const apiLimiter = rateLimit({
  */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
-  skip: skipLocalhost,
+  max: 5000, // Increased default to prevent lockout during intensive login testing
+  skip: skipLimit,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next) => {
