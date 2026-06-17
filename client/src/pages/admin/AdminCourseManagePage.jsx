@@ -206,35 +206,65 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div
             style={{
-              width: 52, height: 38, borderRadius: 8, overflow: "hidden",
-              background: "#e9e4f7", flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12,
+              width: 52,
+              height: 38,
+              borderRadius: 8,
+              overflow: "hidden",
+              background: "#e9e4f7",
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 12,
             }}
           >
-            {course.thumbnail
-              ? <img src={course.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : <span style={{ color: "#9ca3af", fontWeight: 700, fontSize: 10 }}>No img</span>}
+            {course.thumbnail ? (
+              <img
+                src={course.thumbnail}
+                alt=""
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <span style={{ color: "#9ca3af", fontWeight: 700, fontSize: 10 }}>
+                No img
+              </span>
+            )}
           </div>
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontWeight: 700, color: "#1a1a2e", fontSize: 13,
-                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                fontWeight: 700,
+                color: "#1a1a2e",
+                fontSize: 13,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
                 maxWidth: 220,
               }}
               title={course.title}
             >
               {course.title}
             </div>
-            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>{course.category} · {course.level}</div>
+            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
+              {course.category} · {course.level}
+            </div>
           </div>
         </div>
       </td>
 
       {/* Instructor */}
-      <td style={{ padding: "14px 12px", fontSize: 13, color: "#374151", whiteSpace: "nowrap" }}>
+      <td
+        style={{
+          padding: "14px 12px",
+          fontSize: 13,
+          color: "#374151",
+          whiteSpace: "nowrap",
+        }}
+      >
         <div style={{ fontWeight: 600 }}>{course.instructor?.name || "—"}</div>
-        <div style={{ fontSize: 11, color: "#9ca3af" }}>{course.instructor?.email}</div>
+        <div style={{ fontSize: 11, color: "#9ca3af" }}>
+          {course.instructor?.email}
+        </div>
       </td>
 
       {/* Status */}
@@ -243,13 +273,32 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
       </td>
 
       {/* Price */}
-      <td style={{ padding: "14px 12px", fontSize: 13, fontWeight: 700, color: "#1a1a2e", whiteSpace: "nowrap" }}>
+      <td
+        style={{
+          padding: "14px 12px",
+          fontSize: 13,
+          fontWeight: 700,
+          color: "#1a1a2e",
+          whiteSpace: "nowrap",
+        }}
+      >
         ${course.price?.toFixed(2) ?? "0.00"}
       </td>
 
       {/* Date */}
-      <td style={{ padding: "14px 12px", fontSize: 12, color: "#6b7280", whiteSpace: "nowrap" }}>
-        {new Date(course.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+      <td
+        style={{
+          padding: "14px 12px",
+          fontSize: 12,
+          color: "#6b7280",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {new Date(course.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
       </td>
 
       {/* Actions */}
@@ -261,9 +310,15 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
                 onClick={() => onApprove(course._id)}
                 disabled={busy}
                 style={{
-                  background: "#dcfce7", color: "#16a34a", border: "none",
-                  borderRadius: 7, padding: "5px 10px", fontSize: 11, fontWeight: 700,
-                  cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
+                  background: "#dcfce7",
+                  color: "#16a34a",
+                  border: "none",
+                  borderRadius: 7,
+                  padding: "5px 10px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: busy ? "not-allowed" : "pointer",
+                  opacity: busy ? 0.6 : 1,
                 }}
               >
                 Approve
@@ -272,9 +327,15 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
                 onClick={() => onReject(course)}
                 disabled={busy}
                 style={{
-                  background: "#fee2e2", color: "#dc2626", border: "none",
-                  borderRadius: 7, padding: "5px 10px", fontSize: 11, fontWeight: 700,
-                  cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
+                  background: "#fee2e2",
+                  color: "#dc2626",
+                  border: "none",
+                  borderRadius: 7,
+                  padding: "5px 10px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: busy ? "not-allowed" : "pointer",
+                  opacity: busy ? 0.6 : 1,
                 }}
               >
                 Reject
@@ -282,7 +343,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
             </>
           )}
 
-          {course.status === "published" && (
+          {/* {course.status === "published" && (
             <button
               onClick={() => onUnpublish(course._id)}
               disabled={busy}
@@ -293,6 +354,46 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
               }}
             >
               Unpublish
+            </button>
+          )} */}
+
+          {course.status === "published" && (
+            <button
+              onClick={() => onUnpublish(course._id)}
+              disabled={busy}
+              style={{
+                background: "#fef3c7",
+                color: "#92400e",
+                border: "none",
+                borderRadius: 7,
+                padding: "5px 10px",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: busy ? "not-allowed" : "pointer",
+                opacity: busy ? 0.6 : 1,
+              }}
+            >
+              Unpublish
+            </button>
+          )}
+
+          {course.status === "draft" && (
+            <button
+              onClick={() => onRepublish(course._id)}
+              disabled={busy}
+              style={{
+                background: "#dcfce7",
+                color: "#166534",
+                border: "none",
+                borderRadius: 7,
+                padding: "5px 10px",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: busy ? "not-allowed" : "pointer",
+                opacity: busy ? 0.6 : 1,
+              }}
+            >
+              Publish
             </button>
           )}
 
@@ -311,9 +412,15 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
             onClick={() => onDelete(course)}
             disabled={busy}
             style={{
-              background: "#fee2e2", color: "#dc2626", border: "none",
-              borderRadius: 7, padding: "5px 10px", fontSize: 11, fontWeight: 700,
-              cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1,
+              background: "#fee2e2",
+              color: "#dc2626",
+              border: "none",
+              borderRadius: 7,
+              padding: "5px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: busy ? "not-allowed" : "pointer",
+              opacity: busy ? 0.6 : 1,
             }}
           >
             Delete
@@ -400,6 +507,26 @@ export default function AdminCourseManagePage() {
     }
   };
 
+  const handleRepublish = async (courseId) => {
+    setActionId(courseId);
+
+    try {
+      await updateCourse(courseId, { status: "published" });
+
+      toast.success("Course republished.");
+
+      setCourses((prev) =>
+        prev.map((c) =>
+          c._id === courseId ? { ...c, status: "published" } : c,
+        ),
+      );
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to republish.");
+    } finally {
+      setActionId(null);
+    }
+  };
+
   const handleRejectConfirm = async (reason) => {
     if (!rejectTarget) return;
     setModalLoading(true);
@@ -436,29 +563,77 @@ export default function AdminCourseManagePage() {
   const pendingCount = courses.filter((c) => c.status === "pending").length;
 
   return (
-    <div style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}>
+    <div
+      style={{ background: "#f7f5ff", minHeight: "100vh", paddingBottom: 60 }}
+    >
       {/* Header */}
-      <div style={{ background: `linear-gradient(135deg, #1e1340 0%, ${purpleDark} 50%, ${purple} 100%)` }}>
-        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "36px 24px 48px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      <div
+        style={{
+          background: `linear-gradient(135deg, #1e1340 0%, ${purpleDark} 50%, ${purple} 100%)`,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1180,
+            margin: "0 auto",
+            padding: "36px 24px 48px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Link
                   to="/admin/dashboard"
-                  style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}
+                  style={{
+                    color: "rgba(255,255,255,0.6)",
+                    textDecoration: "none",
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
                 >
                   ← Dashboard
                 </Link>
               </div>
-              <h1 style={{ color: "#fff", margin: "8px 0 4px", fontSize: 24, fontWeight: 800 }}>
+              <h1
+                style={{
+                  color: "#fff",
+                  margin: "8px 0 4px",
+                  fontSize: 24,
+                  fontWeight: 800,
+                }}
+              >
                 Course Management
               </h1>
-              <p style={{ color: "rgba(255,255,255,0.65)", margin: 0, fontSize: 13 }}>
-                {pagination.total} course{pagination.total !== 1 ? "s" : ""} on the platform
+              <p
+                style={{
+                  color: "rgba(255,255,255,0.65)",
+                  margin: 0,
+                  fontSize: 13,
+                }}
+              >
+                {pagination.total} course{pagination.total !== 1 ? "s" : ""} on
+                the platform
               </p>
             </div>
             {pendingCount > 0 && (
-              <div style={{ background: "#fef3c7", borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700, color: "#92400e" }}>
+              <div
+                style={{
+                  background: "#fef3c7",
+                  borderRadius: 10,
+                  padding: "8px 16px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#92400e",
+                }}
+              >
                 {pendingCount} pending in current view
               </div>
             )}
@@ -466,27 +641,51 @@ export default function AdminCourseManagePage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1180, margin: "-24px auto 0", padding: "0 24px" }}>
+      <div
+        style={{ maxWidth: 1180, margin: "-24px auto 0", padding: "0 24px" }}
+      >
         {/* Search + Filter card */}
-        <div style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.07)", marginBottom: 20, overflow: "hidden" }}>
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 16,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+            marginBottom: 20,
+            overflow: "hidden",
+          }}
+        >
           {/* Search bar */}
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f0fa" }}>
+          <div
+            style={{ padding: "16px 20px", borderBottom: "1px solid #f3f0fa" }}
+          >
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title or category…"
               style={{
-                width: "100%", boxSizing: "border-box",
-                border: "1.5px solid #e9e4f7", borderRadius: 10,
-                padding: "10px 14px", fontSize: 14, outline: "none",
-                background: "#faf8ff", color: "#1a1a2e",
+                width: "100%",
+                boxSizing: "border-box",
+                border: "1.5px solid #e9e4f7",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontSize: 14,
+                outline: "none",
+                background: "#faf8ff",
+                color: "#1a1a2e",
               }}
             />
           </div>
 
           {/* Status tabs */}
-          <div style={{ display: "flex", padding: "0 20px", gap: 2, overflowX: "auto" }}>
+          <div
+            style={{
+              display: "flex",
+              padding: "0 20px",
+              gap: 2,
+              overflowX: "auto",
+            }}
+          >
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -494,7 +693,10 @@ export default function AdminCourseManagePage() {
                 style={{
                   padding: "12px 16px",
                   border: "none",
-                  borderBottom: activeTab === tab.key ? `3px solid ${purple}` : "3px solid transparent",
+                  borderBottom:
+                    activeTab === tab.key
+                      ? `3px solid ${purple}`
+                      : "3px solid transparent",
                   background: "none",
                   color: activeTab === tab.key ? purple : "#6b7280",
                   fontWeight: activeTab === tab.key ? 800 : 600,
@@ -511,32 +713,69 @@ export default function AdminCourseManagePage() {
         </div>
 
         {/* Table */}
-        <div style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.07)", overflow: "hidden" }}>
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 16,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+            overflow: "hidden",
+          }}
+        >
           {loading ? (
             <div style={{ padding: "64px 24px", textAlign: "center" }}>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <div style={{ width: 40, height: 40, border: `4px solid ${purpleLight}`, borderTop: `4px solid ${purple}`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 14px" }} />
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  border: `4px solid ${purpleLight}`,
+                  borderTop: `4px solid ${purple}`,
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite",
+                  margin: "0 auto 14px",
+                }}
+              />
               <p style={{ color: "#6b7280", margin: 0 }}>Loading courses…</p>
             </div>
           ) : courses.length === 0 ? (
             <div style={{ padding: "64px 24px", textAlign: "center" }}>
-              <h3 style={{ color: "#1a1a2e", margin: "0 0 6px" }}>No courses found</h3>
+              <h3 style={{ color: "#1a1a2e", margin: "0 0 6px" }}>
+                No courses found
+              </h3>
               <p style={{ color: "#6b7280", margin: 0, fontSize: 14 }}>
-                {search ? "Try a different search term." : `No ${activeTab === "all" ? "" : activeTab + " "}courses yet.`}
+                {search
+                  ? "Try a different search term."
+                  : `No ${activeTab === "all" ? "" : activeTab + " "}courses yet.`}
               </p>
             </div>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ background: "#faf8ff", borderBottom: "2px solid #f3f0fa" }}>
-                    {["Course", "Instructor", "Status", "Price", "Created", "Actions"].map((h) => (
+                  <tr
+                    style={{
+                      background: "#faf8ff",
+                      borderBottom: "2px solid #f3f0fa",
+                    }}
+                  >
+                    {[
+                      "Course",
+                      "Instructor",
+                      "Status",
+                      "Price",
+                      "Created",
+                      "Actions",
+                    ].map((h) => (
                       <th
                         key={h}
                         style={{
-                          padding: "12px 16px", textAlign: "left",
-                          fontSize: 11, fontWeight: 800, color: "#6b7280",
-                          textTransform: "uppercase", letterSpacing: "0.06em",
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontSize: 11,
+                          fontWeight: 800,
+                          color: "#6b7280",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
                           whiteSpace: "nowrap",
                         }}
                       >
@@ -553,6 +792,7 @@ export default function AdminCourseManagePage() {
                       onApprove={handleApprove}
                       onReject={setRejectTarget}
                       onUnpublish={handleUnpublish}
+                      onRepublish={handleRepublish}
                       onDelete={setDeleteTarget}
                       actionId={actionId}
                     />
@@ -564,9 +804,20 @@ export default function AdminCourseManagePage() {
 
           {/* Pagination */}
           {!loading && pagination.pages > 1 && (
-            <div style={{ padding: "16px 20px", borderTop: "1px solid #f3f0fa", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div
+              style={{
+                padding: "16px 20px",
+                borderTop: "1px solid #f3f0fa",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
               <span style={{ fontSize: 13, color: "#6b7280" }}>
-                Page {pagination.page} of {pagination.pages} · {pagination.total} courses
+                Page {pagination.page} of {pagination.pages} ·{" "}
+                {pagination.total} courses
               </span>
               <div style={{ display: "flex", gap: 8 }}>
                 <button
@@ -575,8 +826,11 @@ export default function AdminCourseManagePage() {
                   style={{
                     background: pagination.page <= 1 ? "#f3f4f6" : purpleLight,
                     color: pagination.page <= 1 ? "#9ca3af" : purple,
-                    border: "none", borderRadius: 8, padding: "8px 16px",
-                    fontWeight: 700, fontSize: 13,
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 16px",
+                    fontWeight: 700,
+                    fontSize: 13,
                     cursor: pagination.page <= 1 ? "not-allowed" : "pointer",
                   }}
                 >
@@ -586,11 +840,21 @@ export default function AdminCourseManagePage() {
                   onClick={() => fetchCourses(pagination.page + 1)}
                   disabled={pagination.page >= pagination.pages}
                   style={{
-                    background: pagination.page >= pagination.pages ? "#f3f4f6" : purpleLight,
-                    color: pagination.page >= pagination.pages ? "#9ca3af" : purple,
-                    border: "none", borderRadius: 8, padding: "8px 16px",
-                    fontWeight: 700, fontSize: 13,
-                    cursor: pagination.page >= pagination.pages ? "not-allowed" : "pointer",
+                    background:
+                      pagination.page >= pagination.pages
+                        ? "#f3f4f6"
+                        : purpleLight,
+                    color:
+                      pagination.page >= pagination.pages ? "#9ca3af" : purple,
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 16px",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor:
+                      pagination.page >= pagination.pages
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 >
                   Next →
