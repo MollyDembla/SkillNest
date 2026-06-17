@@ -197,7 +197,7 @@ function DeleteModal({ course, onConfirm, onClose, loading }) {
 }
 
 // ─── course row ───────────────────────────────────────────────
-function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionId }) {
+function CourseRow({ course, onApprove, onReject, onUnpublish, onRepublish, onDelete, actionId }) {
   const busy = actionId === course._id;
   return (
     <tr style={{ borderBottom: "1px solid #f3f0fa" }}>
