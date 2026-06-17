@@ -296,7 +296,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
             </button>
           )}
 
-          <Link
+          {/* <Link
             to={`/courses/${course._id}`}
             target="_blank"
             style={{
@@ -305,7 +305,7 @@ function CourseRow({ course, onApprove, onReject, onUnpublish, onDelete, actionI
             }}
           >
             View
-          </Link>
+          </Link> */}
 
           <button
             onClick={() => onDelete(course)}
