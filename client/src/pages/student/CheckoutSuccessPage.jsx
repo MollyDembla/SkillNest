@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { confirmPayment } from "../../services/paymentService";
 
 export default function CheckoutSuccessPage() {
   const [searchParams] = useSearchParams();
   const { reload } = useCart();
+  const { refreshEnrollments } = useAuth();
   const redirectStatus = searchParams.get("redirect_status");
   const paymentIntentId = searchParams.get("payment_intent");
   const [confirming, setConfirming] = useState(false);
@@ -25,6 +27,7 @@ export default function CheckoutSuccessPage() {
         }
       }
       reload();
+      refreshEnrollments();
     };
     run();
   }, []);

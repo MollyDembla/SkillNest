@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as authService from "../services/authService";
 import api from "../services/apiClient";
+import { getMyEnrollments } from "../services/enrollmentService";
 
 const AuthContext = createContext(null);
 
@@ -10,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.getItem("accessToken") || null,
   );
   const [initializing, setInitializing] = useState(true);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
 
   const applyToken = (token) => {
     if (token) {
@@ -46,6 +48,28 @@ export const AuthProvider = ({ children }) => {
 
     bootstrap();
   }, []);
+
+  const refreshEnrollments = async () => {
+    if (user && user.role === "student") {
+      try {
+        const res = await getMyEnrollments();
+        const ids = new Set(
+          (res.data?.enrollments || [])
+            .map((e) => (e.course?._id || e.course)?.toString())
+            .filter(Boolean)
+        );
+        setEnrolledCourseIds(ids);
+      } catch (err) {
+        console.error("Failed to refresh enrollments:", err);
+      }
+    } else {
+      setEnrolledCourseIds(new Set());
+    }
+  };
+
+  useEffect(() => {
+    refreshEnrollments();
+  }, [user]);
 
   const login = async (credentials) => {
     const res = await authService.login(credentials);
@@ -85,6 +109,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         refreshSession,
         setUser,
+        enrolledCourseIds,
+        refreshEnrollments,
       }}
     >
       {children}

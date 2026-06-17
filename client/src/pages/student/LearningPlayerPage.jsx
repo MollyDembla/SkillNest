@@ -32,9 +32,120 @@ function toEmbedUrl(url) {
 }
 
 // ─── video player ────────────────────────────────────────────
-function VideoPlayer({ lesson, onEnded }) {
+// ─── youtube player ──────────────────────────────────────────
+function YouTubePlayer({ videoUrl, onHalfWatched, onEnded }) {
+  const containerRef = useRef(null);
+  const playerRef = useRef(null);
+  const hasTriggeredRef = useRef(false);
+  const intervalRef = useRef(null);
+
+  const getYouTubeId = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const videoId = getYouTubeId(videoUrl);
+
+  useEffect(() => {
+    hasTriggeredRef.current = false;
+    
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    if (!videoId) return;
+
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    let playerCreated = false;
+    const createPlayer = () => {
+      if (playerCreated || !containerRef.current) return;
+      playerCreated = true;
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId: videoId,
+        playerVars: {
+          rel: 0,
+          autoplay: 0,
+        },
+        events: {
+          onStateChange: (event) => {
+            if (event.data === window.YT.PlayerState.ENDED) {
+              onEnded();
+            }
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              startTracking();
+            } else {
+              stopTracking();
+            }
+          }
+        }
+      });
+    };
+
+    const startTracking = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(() => {
+        if (playerRef.current && typeof playerRef.current.getDuration === 'function') {
+          const duration = playerRef.current.getDuration();
+          const currentTime = playerRef.current.getCurrentTime();
+          if (duration > 0 && currentTime >= duration / 2) {
+            if (!hasTriggeredRef.current) {
+              hasTriggeredRef.current = true;
+              onHalfWatched();
+              stopTracking();
+            }
+          }
+        }
+      }, 1000);
+    };
+
+    const stopTracking = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+    } else {
+      const prevCallback = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (prevCallback) prevCallback();
+        createPlayer();
+      };
+    }
+
+    return () => {
+      stopTracking();
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        playerRef.current.destroy();
+      }
+    };
+  }, [videoId, onHalfWatched, onEnded]);
+
+  return (
+    <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", background: "#000" }}>
+      <div ref={containerRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
+    </div>
+  );
+}
+
+// ─── video player ────────────────────────────────────────────
+function VideoPlayer({ lesson, onEnded, onHalfWatched }) {
   const videoRef = useRef(null);
   const type = resolveVideoType(lesson?.videoUrl);
+  const hasTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    hasTriggeredRef.current = false;
+  }, [lesson?._id]);
 
   if (!lesson?.videoUrl) {
     return (
@@ -60,7 +171,11 @@ function VideoPlayer({ lesson, onEnded }) {
     );
   }
 
-  if (type === "youtube" || type === "vimeo") {
+  if (type === "youtube") {
+    return <YouTubePlayer videoUrl={lesson.videoUrl} onHalfWatched={onHalfWatched} onEnded={onEnded} />;
+  }
+
+  if (type === "vimeo") {
     return (
       <div
         style={{
@@ -84,6 +199,16 @@ function VideoPlayer({ lesson, onEnded }) {
     );
   }
 
+  const handleTimeUpdate = (e) => {
+    const video = e.target;
+    if (video.duration && video.currentTime >= video.duration / 2) {
+      if (!hasTriggeredRef.current) {
+        hasTriggeredRef.current = true;
+        onHalfWatched();
+      }
+    }
+  };
+
   return (
     <video
       ref={videoRef}
@@ -91,6 +216,7 @@ function VideoPlayer({ lesson, onEnded }) {
       src={lesson.videoUrl}
       controls
       onEnded={onEnded}
+      onTimeUpdate={handleTimeUpdate}
       style={{
         width: "100%",
         borderRadius: 12,
@@ -375,8 +501,14 @@ export default function LearningPlayerPage() {
   const activeLesson = lessons[activeLessonIndex] || null;
   const isCurrentCompleted = activeLesson ? completedLessons.has(activeLesson._id) : false;
 
-  const handleMarkComplete = useCallback(async () => {
-    if (!activeLesson || marking || isCurrentCompleted) return;
+  const markCurrentComplete = useCallback(async (shouldAdvance = false) => {
+    if (!activeLesson || marking) return;
+    if (completedLessons.has(activeLesson._id)) {
+      if (shouldAdvance && activeLessonIndex < lessons.length - 1) {
+        setActiveLessonIndex((i) => i + 1);
+      }
+      return;
+    }
     setMarking(true);
     try {
       const res = await markLessonComplete(courseId, activeLesson._id);
@@ -388,8 +520,7 @@ export default function LearningPlayerPage() {
         setShowCompletion(true);
       } else {
         toast.success("Lesson complete!");
-        // Auto-advance after brief delay
-        if (activeLessonIndex < lessons.length - 1) {
+        if (shouldAdvance && activeLessonIndex < lessons.length - 1) {
           setTimeout(() => setActiveLessonIndex((i) => i + 1), 500);
         }
       }
@@ -398,7 +529,7 @@ export default function LearningPlayerPage() {
     } finally {
       setMarking(false);
     }
-  }, [activeLesson, marking, isCurrentCompleted, courseId, activeLessonIndex, lessons.length]);
+  }, [activeLesson, marking, completedLessons, courseId, activeLessonIndex, lessons.length]);
 
   // ── Loading ──────────────────────────────────────────────
   if (loading) {
@@ -621,7 +752,11 @@ export default function LearningPlayerPage() {
           {/* Video */}
           <div style={{ background: "#0d0b14", flexShrink: 0 }}>
             <div style={{ maxWidth: 960, margin: "0 auto", padding: "0" }}>
-              <VideoPlayer lesson={activeLesson} onEnded={handleMarkComplete} />
+              <VideoPlayer
+                lesson={activeLesson}
+                onHalfWatched={() => markCurrentComplete(false)}
+                onEnded={() => markCurrentComplete(true)}
+              />
             </div>
           </div>
 
@@ -673,29 +808,6 @@ export default function LearningPlayerPage() {
               </p>
             </div>
 
-            {/* Mark complete button */}
-            <button
-              onClick={handleMarkComplete}
-              disabled={marking || isCurrentCompleted || !activeLesson}
-              style={{
-                flexShrink: 0,
-                border: "none",
-                borderRadius: 12,
-                padding: "10px 20px",
-                fontSize: 13,
-                fontWeight: 800,
-                cursor: isCurrentCompleted ? "default" : marking ? "not-allowed" : "pointer",
-                background: isCurrentCompleted
-                  ? "rgba(22,163,74,0.15)"
-                  : "linear-gradient(135deg, #22c55e, #16a34a)",
-                color: isCurrentCompleted ? "#4ade80" : "#fff",
-                opacity: (marking || !activeLesson) ? 0.6 : 1,
-                transition: "opacity 0.15s",
-                boxShadow: isCurrentCompleted ? "none" : "0 6px 20px rgba(22,163,74,0.3)",
-              }}
-            >
-              {isCurrentCompleted ? "✓ Completed" : marking ? "Saving…" : "Mark Complete"}
-            </button>
           </div>
 
             {/* Tab nav */}

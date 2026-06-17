@@ -19,7 +19,7 @@ function Stars({ rating }) {
 
 export default function CourseCard({ course }) {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, enrolledCourseIds } = useAuth();
   const { cart, add: addToCart } = useCart();
   const { wishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
   const [cartLoading, setCartLoading] = useState(false);
@@ -30,6 +30,7 @@ export default function CourseCard({ course }) {
   const inCart = cart?.items?.some((item) => (item.course?._id || item._id)?.toString() === id);
   const inWishlist = wishlist?.courses?.some((c) => c._id?.toString() === id);
   const isStudent = user?.role === "student";
+  const isEnrolled = enrolledCourseIds && enrolledCourseIds.has(id?.toString());
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -179,47 +180,70 @@ export default function CourseCard({ course }) {
       {/* Action buttons */}
       {(!user || isStudent) && (
         <div style={{ padding: "0 14px 12px", display: "flex", gap: 8 }}>
-          <button
-            onClick={handleAddToCart}
-            disabled={cartLoading}
-            style={{
-              flex: 1,
-              border: "none",
-              borderRadius: 4,
-              padding: "9px 12px",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: cartLoading ? "not-allowed" : "pointer",
-              background: inCart ? "#e8f9ee" : "#5f4999",
-              color: inCart ? "#166534" : "#fff",
-              transition: "background 0.15s",
-              opacity: cartLoading ? 0.7 : 1,
-            }}
-          >
-            {cartLoading ? "Adding…" : inCart ? "In cart ✓" : "Add to cart"}
-          </button>
-          <button
-            onClick={handleWishlist}
-            disabled={wishlistLoading}
-            title={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
-            style={{
-              border: `1.5px solid ${inWishlist ? "#dc2626" : "#d1d7dc"}`,
-              borderRadius: 4,
-              padding: "9px 12px",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: wishlistLoading ? "not-allowed" : "pointer",
-              background: inWishlist ? "#fef2f2" : "#fff",
-              color: inWishlist ? "#dc2626" : "#6a6f73",
-              transition: "all 0.15s",
-              opacity: wishlistLoading ? 0.7 : 1,
-              flexShrink: 0,
-              fontFamily: "inherit",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {wishlistLoading ? "…" : inWishlist ? "Saved" : "Save"}
-          </button>
+          {isEnrolled ? (
+            <Link
+              to={`/learn/${id}`}
+              style={{
+                flex: 1,
+                textAlign: "center",
+                textDecoration: "none",
+                borderRadius: 4,
+                padding: "9px 12px",
+                fontSize: 13,
+                fontWeight: 700,
+                background: "#16a34a",
+                color: "#fff",
+                display: "block",
+                boxShadow: "0 2px 8px rgba(22,163,74,0.2)"
+              }}
+            >
+              ✓ Enrolled (Start Learning)
+            </Link>
+          ) : (
+            <>
+              <button
+                onClick={handleAddToCart}
+                disabled={cartLoading}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: 4,
+                  padding: "9px 12px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: cartLoading ? "not-allowed" : "pointer",
+                  background: inCart ? "#e8f9ee" : "#5f4999",
+                  color: inCart ? "#166534" : "#fff",
+                  transition: "background 0.15s",
+                  opacity: cartLoading ? 0.7 : 1,
+                }}
+              >
+                {cartLoading ? "Adding…" : inCart ? "In cart ✓" : "Add to cart"}
+              </button>
+              <button
+                onClick={handleWishlist}
+                disabled={wishlistLoading}
+                title={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
+                style={{
+                  border: `1.5px solid ${inWishlist ? "#dc2626" : "#d1d7dc"}`,
+                  borderRadius: 4,
+                  padding: "9px 12px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: wishlistLoading ? "not-allowed" : "pointer",
+                  background: inWishlist ? "#fef2f2" : "#fff",
+                  color: inWishlist ? "#dc2626" : "#6a6f73",
+                  transition: "all 0.15s",
+                  opacity: wishlistLoading ? 0.7 : 1,
+                  flexShrink: 0,
+                  fontFamily: "inherit",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {wishlistLoading ? "…" : inWishlist ? "Saved" : "Save"}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
