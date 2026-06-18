@@ -15,8 +15,11 @@ const cookieOptions = {
  * Register a user
  */
 const register = asyncHandler(async (req, res, next) => {
-  const user = await authService.register(req.body);
+  const { user, accessToken, refreshToken } = await authService.register(req.body);
   
+  // Set refresh token in secure HTTP-only cookie
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+
   res.status(201).json(
     new ApiResponse(
       201,
@@ -26,8 +29,10 @@ const register = asyncHandler(async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar,
           isEmailVerified: user.isEmailVerified
-        }
+        },
+        accessToken
       },
       'User registered successfully. Please verify your email.'
     )

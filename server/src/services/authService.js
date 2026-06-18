@@ -45,9 +45,15 @@ const register = async (userData) => {
     console.error('Email verification sending failed on register:', err);
   });
 
-  
+  // Generate tokens for auto-login
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
 
-  return user;
+  return {
+    user,
+    accessToken,
+    refreshToken
+  };
 };
 
 /**

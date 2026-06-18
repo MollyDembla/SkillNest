@@ -173,6 +173,42 @@ function PendingCourseCard({ course, onApprove, onReject, approving, rejecting }
   );
 }
 
+function PublishedCourseCard({ course }) {
+  return (
+    <div style={{ background: "#fff", border: "1px solid #e8e8e8", borderRadius: 4, overflow: "hidden" }}>
+      <div style={{ height: 80, background: "#ede9f8", position: "relative", overflow: "hidden" }}>
+        {course.thumbnail ? (
+          <img src={course.thumbnail} alt={course.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #ede9f8, #d8c4ff)" }} />
+        )}
+        <span style={{
+          position: "absolute", top: 6, right: 6,
+          background: "rgba(0,0,0,0.55)", color: "#fff",
+          fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 2,
+        }}>
+          ${course.price?.toFixed(2) || "0.00"}
+        </span>
+      </div>
+
+      <div style={{ padding: "10px 12px" }}>
+        <div style={{ fontWeight: 700, color: "#1c1d1f", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>
+          {course.title}
+        </div>
+        <div style={{ fontSize: 11, color: "#6a6f73", marginBottom: 8 }}>
+          {course.instructor?.name} · {course.category}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 10, color: "#16a34a", background: "#dcfce7", fontWeight: 700, padding: "2px 6px", borderRadius: 2 }}>
+            Published
+          </span>
+          <span style={{ fontSize: 10, color: "#9ca3af" }}>{timeAgo(course.createdAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
@@ -196,11 +232,19 @@ export default function AdminDashboardPage() {
     try {
       await updateCourse(courseId, { status: "published" });
       toast.success("Course approved and published.");
-      setData((prev) => ({
-        ...prev,
-        pendingCourses: prev.pendingCourses.filter((c) => c._id !== courseId),
-        stats: { ...prev.stats, pendingCourses: prev.stats.pendingCourses - 1, publishedCourses: prev.stats.publishedCourses + 1 },
-      }));
+      setData((prev) => {
+        const approvedCourse = prev.pendingCourses.find((c) => c._id === courseId);
+        const updatedPublished = approvedCourse 
+          ? [{ ...approvedCourse, status: "published", createdAt: new Date().toISOString() }, ...prev.publishedCourses].slice(0, 5)
+          : prev.publishedCourses;
+
+        return {
+          ...prev,
+          pendingCourses: prev.pendingCourses.filter((c) => c._id !== courseId),
+          publishedCourses: updatedPublished,
+          stats: { ...prev.stats, pendingCourses: prev.stats.pendingCourses - 1, publishedCourses: prev.stats.publishedCourses + 1 },
+        };
+      });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to approve.");
     } finally {
@@ -248,7 +292,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const { stats, pendingCourses, recentUsers, revenueByDay } = data;
+  const { stats, pendingCourses, publishedCourses, recentUsers, revenueByDay } = data;
 
   return (
     <div style={{ background: "#f7f9fa", minHeight: "100vh", paddingBottom: 60 }}>
@@ -289,39 +333,70 @@ export default function AdminDashboardPage() {
         {/* Middle row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 16, marginBottom: 16 }}>
 
-          {/* Pending Approvals */}
-          <div style={{ background: "#fff", border: "1px solid #e8e8e8", borderRadius: 4, overflow: "hidden" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#1c1d1f", letterSpacing: "-0.01em" }}>Pending Approvals</h2>
-                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6a6f73" }}>
-                  {stats.pendingCourses > 0 ? `${stats.pendingCourses} course${stats.pendingCourses !== 1 ? "s" : ""} awaiting review` : "All caught up"}
-                </p>
+          {/* Left Column Stack */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Pending Approvals */}
+            <div style={{ background: "#fff", border: "1px solid #e8e8e8", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#1c1d1f", letterSpacing: "-0.01em" }}>Pending Approvals</h2>
+                  <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6a6f73" }}>
+                    {stats.pendingCourses > 0 ? `${stats.pendingCourses} course${stats.pendingCourses !== 1 ? "s" : ""} awaiting review` : "All caught up"}
+                  </p>
+                </div>
+                <Link to="/admin/approvals" style={{ fontSize: 13, color: "#5f4999", fontWeight: 600, textDecoration: "none", borderBottom: "1px solid #5f4999", paddingBottom: 1 }}>
+                  View all
+                </Link>
               </div>
-              <Link to="/admin/approvals" style={{ fontSize: 13, color: "#5f4999", fontWeight: 600, textDecoration: "none", borderBottom: "1px solid #5f4999", paddingBottom: 1 }}>
-                View all
-              </Link>
+
+              {pendingCourses.length === 0 ? (
+                <div style={{ padding: "48px 24px", textAlign: "center" }}>
+                  <p style={{ color: "#1c1d1f", fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>No pending courses</p>
+                  <p style={{ color: "#6a6f73", fontSize: 13, margin: 0 }}>All submissions have been reviewed.</p>
+                </div>
+              ) : (
+                <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+                  {pendingCourses.map((course) => (
+                    <PendingCourseCard
+                      key={course._id}
+                      course={course}
+                      onApprove={handleApprove}
+                      onReject={handleReject}
+                      approving={approvingId === course._id}
+                      rejecting={rejectingId === course._id}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
-            {pendingCourses.length === 0 ? (
-              <div style={{ padding: "48px 24px", textAlign: "center" }}>
-                <p style={{ color: "#1c1d1f", fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>No pending courses</p>
-                <p style={{ color: "#6a6f73", fontSize: 13, margin: 0 }}>All submissions have been reviewed.</p>
+            {/* Recently Published Courses */}
+            <div style={{ background: "#fff", border: "1px solid #e8e8e8", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #e8e8e8", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#1c1d1f", letterSpacing: "-0.01em" }}>Recently Published Courses</h2>
+                  <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6a6f73" }}>
+                    {stats.publishedCourses > 0 ? `${stats.publishedCourses} course${stats.publishedCourses !== 1 ? "s" : ""} live on platform` : "No published courses"}
+                  </p>
+                </div>
+                <Link to="/admin/courses" style={{ fontSize: 13, color: "#5f4999", fontWeight: 600, textDecoration: "none", borderBottom: "1px solid #5f4999", paddingBottom: 1 }}>
+                  Manage courses
+                </Link>
               </div>
-            ) : (
-              <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-                {pendingCourses.map((course) => (
-                  <PendingCourseCard
-                    key={course._id}
-                    course={course}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
-                    approving={approvingId === course._id}
-                    rejecting={rejectingId === course._id}
-                  />
-                ))}
-              </div>
-            )}
+
+              {!publishedCourses || publishedCourses.length === 0 ? (
+                <div style={{ padding: "48px 24px", textAlign: "center" }}>
+                  <p style={{ color: "#1c1d1f", fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>No published courses yet</p>
+                  <p style={{ color: "#6a6f73", fontSize: 13, margin: 0 }}>Submit approved courses to see them here.</p>
+                </div>
+              ) : (
+                <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+                  {publishedCourses.map((course) => (
+                    <PublishedCourseCard key={course._id} course={course} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right column */}

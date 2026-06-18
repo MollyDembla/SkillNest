@@ -81,6 +81,11 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (payload) => {
     const res = await authService.register(payload);
+    const token = res.data?.accessToken;
+    if (token) {
+      applyToken(token);
+      setUser(res.data.user);
+    }
     return res;
   };
 

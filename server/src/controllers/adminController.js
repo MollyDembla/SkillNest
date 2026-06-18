@@ -19,6 +19,7 @@ const getDashboard = asyncHandler(async (req, res) => {
     revenueMonthAgg,
     revenueByDayAgg,
     pendingCourses,
+    publishedCourses,
     recentUsers,
   ] = await Promise.all([
     // User counts grouped by role
@@ -56,6 +57,13 @@ const getDashboard = asyncHandler(async (req, res) => {
 
     // Pending courses awaiting approval (newest first, limit 5)
     Course.find({ status: 'pending' })
+      .select('title thumbnail category level price createdAt instructor')
+      .populate('instructor', 'name email avatar')
+      .sort({ createdAt: -1 })
+      .limit(5),
+
+    // Published courses (newest first, limit 5)
+    Course.find({ status: 'published' })
       .select('title thumbnail category level price createdAt instructor')
       .populate('instructor', 'name email avatar')
       .sort({ createdAt: -1 })
@@ -101,6 +109,7 @@ const getDashboard = asyncHandler(async (req, res) => {
       {
         stats,
         pendingCourses,
+        publishedCourses,
         recentUsers,
         revenueByDay: revenueByDayAgg.map((r) => ({
           date: r._id,
